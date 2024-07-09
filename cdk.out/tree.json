@@ -986,6 +986,45 @@
               "version": "2.133.0"
             }
           },
+          "TranslateTextPolicy": {
+            "id": "TranslateTextPolicy",
+            "path": "VideoDubbingStack/TranslateTextPolicy",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/TranslateTextPolicy/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "translate:TranslateText",
+                          "Effect": "Allow",
+                          "Resource": "*"
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "TranslateTextPolicyAECBBE52",
+                    "roles": [
+                      {
+                        "Ref": "SummarizeLambdaRole4DE425CC"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.133.0"
+            }
+          },
           "VideoDubbingDLQ": {
             "id": "VideoDubbingDLQ",
             "path": "VideoDubbingStack/VideoDubbingDLQ",
@@ -1057,7 +1096,10 @@
                     "policyDocument": {
                       "Statement": [
                         {
-                          "Action": "sqs:SendMessage",
+                          "Action": [
+                            "sqs:GetQueueUrl",
+                            "sqs:SendMessage"
+                          ],
                           "Effect": "Allow",
                           "Resource": {
                             "Fn::GetAtt": [
@@ -1198,6 +1240,375 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.133.0"
+            }
+          },
+          "VideoDubbingPollyJobs": {
+            "id": "VideoDubbingPollyJobs",
+            "path": "VideoDubbingStack/VideoDubbingPollyJobs",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/VideoDubbingPollyJobs/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::SNS::Topic",
+                  "aws:cdk:cloudformation:props": {}
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_sns.CfnTopic",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_sns.Topic",
+              "version": "2.133.0"
+            }
+          },
+          "ConvertSubtitlesToPollyLambdaRole": {
+            "id": "ConvertSubtitlesToPollyLambdaRole",
+            "path": "VideoDubbingStack/ConvertSubtitlesToPollyLambdaRole",
+            "children": {
+              "ImportConvertSubtitlesToPollyLambdaRole": {
+                "id": "ImportConvertSubtitlesToPollyLambdaRole",
+                "path": "VideoDubbingStack/ConvertSubtitlesToPollyLambdaRole/ImportConvertSubtitlesToPollyLambdaRole",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.133.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/ConvertSubtitlesToPollyLambdaRole/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                  "version": "2.133.0"
+                }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "VideoDubbingStack/ConvertSubtitlesToPollyLambdaRole/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "VideoDubbingStack/ConvertSubtitlesToPollyLambdaRole/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "sqs:ChangeMessageVisibility",
+                                "sqs:DeleteMessage",
+                                "sqs:GetQueueAttributes",
+                                "sqs:GetQueueUrl",
+                                "sqs:ReceiveMessage"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": {
+                                "Fn::GetAtt": [
+                                  "SrtToPollyE9339DB3",
+                                  "Arn"
+                                ]
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "ConvertSubtitlesToPollyLambdaRoleDefaultPolicyF7A517DF",
+                        "roles": [
+                          {
+                            "Ref": "ConvertSubtitlesToPollyLambdaRole885734CA"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                      "version": "2.133.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Policy",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Role",
+              "version": "2.133.0"
+            }
+          },
+          "SqsGetMessagePolicy": {
+            "id": "SqsGetMessagePolicy",
+            "path": "VideoDubbingStack/SqsGetMessagePolicy",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/SqsGetMessagePolicy/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": [
+                            "sqs:DeleteMessage",
+                            "sqs:GetQueueUrl",
+                            "sqs:SendMessage"
+                          ],
+                          "Effect": "Allow",
+                          "Resource": {
+                            "Fn::GetAtt": [
+                              "SrtToPollyE9339DB3",
+                              "Arn"
+                            ]
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "SqsGetMessagePolicyAD1F9B64",
+                    "roles": [
+                      {
+                        "Ref": "ConvertSubtitlesToPollyLambdaRole885734CA"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.133.0"
+            }
+          },
+          "PollyStartSpeechSynthesisTaskPolicy": {
+            "id": "PollyStartSpeechSynthesisTaskPolicy",
+            "path": "VideoDubbingStack/PollyStartSpeechSynthesisTaskPolicy",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/PollyStartSpeechSynthesisTaskPolicy/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "polly:StartSpeechSynthesisTask",
+                          "Effect": "Allow",
+                          "Resource": "*"
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "PollyStartSpeechSynthesisTaskPolicy9EA3B680",
+                    "roles": [
+                      {
+                        "Ref": "ConvertSubtitlesToPollyLambdaRole885734CA"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.133.0"
+            }
+          },
+          "DynamoPutItemPolicy": {
+            "id": "DynamoPutItemPolicy",
+            "path": "VideoDubbingStack/DynamoPutItemPolicy",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/DynamoPutItemPolicy/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "dynamodb:PutItem",
+                          "Effect": "Allow",
+                          "Resource": [
+                            {
+                              "Fn::GetAtt": [
+                                "VideoDubbungPollyJobStatus67E8C401",
+                                "Arn"
+                              ]
+                            },
+                            {
+                              "Fn::GetAtt": [
+                                "VideoDubbungStatusBC5B51B6",
+                                "Arn"
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "DynamoPutItemPolicy16302363",
+                    "roles": [
+                      {
+                        "Ref": "ConvertSubtitlesToPollyLambdaRole885734CA"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.133.0"
+            }
+          },
+          "VideoDubbingConvertSubsToPolly": {
+            "id": "VideoDubbingConvertSubsToPolly",
+            "path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.133.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.133.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.133.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": {
+                        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+                      },
+                      "s3Key": "8772d9a62a84b8d62bf345fa556970310db2affd222a7e17207e599123d91c58.zip"
+                    },
+                    "environment": {
+                      "variables": {
+                        "DYNAMO_DUBBING_STATUS_TABLE": {
+                          "Ref": "VideoDubbungStatusBC5B51B6"
+                        },
+                        "DYNAMO_POLLY_JOBS_TABLE": {
+                          "Ref": "VideoDubbungPollyJobStatus67E8C401"
+                        },
+                        "STAGING_BUCKET_NAME": {
+                          "Ref": "VideoDubbingStagingCD98B579"
+                        },
+                        "POLLY_LANGUAGE_CODE": "ru-RU",
+                        "POLLY_VOICE_ID": "Tatyana",
+                        "POLLY_JOBS_SNS_ARN": {
+                          "Ref": "VideoDubbingPollyJobsD6E6C2C7"
+                        }
+                      }
+                    },
+                    "handler": "process-transcribe-result.lambda_handler",
+                    "memorySize": 512,
+                    "role": {
+                      "Fn::GetAtt": [
+                        "ConvertSubtitlesToPollyLambdaRole885734CA",
+                        "Arn"
+                      ]
+                    },
+                    "runtime": "python3.11",
+                    "timeout": 60
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.133.0"
+                }
+              },
+              "SqsEventSource:VideoDubbingStackSrtToPollyF5A9260D": {
+                "id": "SqsEventSource:VideoDubbingStackSrtToPollyF5A9260D",
+                "path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly/SqsEventSource:VideoDubbingStackSrtToPollyF5A9260D",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly/SqsEventSource:VideoDubbingStackSrtToPollyF5A9260D/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::Lambda::EventSourceMapping",
+                      "aws:cdk:cloudformation:props": {
+                        "eventSourceArn": {
+                          "Fn::GetAtt": [
+                            "SrtToPollyE9339DB3",
+                            "Arn"
+                          ]
+                        },
+                        "functionName": {
+                          "Ref": "VideoDubbingConvertSubsToPollyCA61E95F"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnEventSourceMapping",
+                      "version": "2.133.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.EventSourceMapping",
                   "version": "2.133.0"
                 }
               }

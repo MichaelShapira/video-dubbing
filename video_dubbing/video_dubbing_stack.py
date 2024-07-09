@@ -121,6 +121,14 @@ class VideoDubbingStack(Stack):
         )) 
         processTransactionResultLambdaRole.attach_inline_policy(s3CopyTargetPolicy)
 
+        translateTextPolicy = iam.Policy(self, "TranslateTextPolicy")  
+        translateTextPolicy.add_statements(PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["translate:TranslateText"],
+            resources=["*"]
+        )) 
+        processTransactionResultLambdaRole.attach_inline_policy(translateTextPolicy)
+
         
         #End Permissions for processTransactionResultLambda
 
@@ -142,7 +150,7 @@ class VideoDubbingStack(Stack):
         sqsPutMessagePolicy = iam.Policy(self, "SqsPutMessagePolicy")  
         sqsPutMessagePolicy.add_statements(PolicyStatement(
             effect=iam.Effect.ALLOW,
-            actions=["sqs:SendMessage"],
+            actions=["sqs:SendMessage","sqs:GetQueueUrl"],
             resources=[queue.queue_arn]
         )) 
         processTransactionResultLambdaRole.attach_inline_policy(sqsPutMessagePolicy)
@@ -174,8 +182,58 @@ class VideoDubbingStack(Stack):
                                     )
         transcribe_event.add_target(targets.LambdaFunction(handler=processTransactionResultLambda)) 
 
+        sns_topic = sns.Topic(self, "VideoDubbingPollyJobs")
+
+        convertSubtitlesToPollyLambdaRole = iam.Role(self, "ConvertSubtitlesToPollyLambdaRole",
+                     assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"))
+        processTransactionResultLambdaRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
+
+
+        sqsPutMessagePolicy = iam.Policy(self, "SqsGetMessagePolicy")  
+        sqsPutMessagePolicy.add_statements(PolicyStatement(
+                    effect=iam.Effect.ALLOW,
+                    actions=["sqs:SendMessage","sqs:GetQueueUrl","sqs:DeleteMessage"],
+                    resources=[queue.queue_arn]
+                )) 
+        convertSubtitlesToPollyLambdaRole.attach_inline_policy(sqsPutMessagePolicy)
+
+        pollyStartSpeechSynthesisTaskPolicy = iam.Policy(self, "PollyStartSpeechSynthesisTaskPolicy") 
+        pollyStartSpeechSynthesisTaskPolicy.add_statements(PolicyStatement(
+                    effect=iam.Effect.ALLOW,
+                    actions=["polly:StartSpeechSynthesisTask"],
+                    resources=["*"]
+                )) 
+        convertSubtitlesToPollyLambdaRole.attach_inline_policy(pollyStartSpeechSynthesisTaskPolicy)
+
+        dynamoPutItemPolicy = iam.Policy(self, "DynamoPutItemPolicy") 
+        dynamoPutItemPolicy.add_statements(PolicyStatement(
+                    effect=iam.Effect.ALLOW,
+                    actions=["dynamodb:PutItem"],
+                    resources=[table.table_arn,table_polly_job.table_arn]
+                )) 
+        convertSubtitlesToPollyLambdaRole.attach_inline_policy(dynamoPutItemPolicy)
+
+        # Lambda that is called when EventBridge identifies that Transcribe Job is over
+        convertSubtitlesToPollyLambda = _lambda.Function(self, "VideoDubbingConvertSubsToPolly",
+                                    runtime=_lambda.Runtime.PYTHON_3_11,
+                                    handler="process-transcribe-result.lambda_handler",
+                                    code=_lambda.Code.from_asset("./lambda/polly"),
+                                    timeout=cdk.Duration.seconds(60),
+                                    memory_size=512,
+                                    role = convertSubtitlesToPollyLambdaRole,
+                                    environment={  
+                                                "DYNAMO_DUBBING_STATUS_TABLE": table.table_name,
+                                                "DYNAMO_POLLY_JOBS_TABLE": table_polly_job.table_name,
+                                                "STAGING_BUCKET_NAME": stagingBucket.bucket_name,
+                                                "POLLY_LANGUAGE_CODE": "ru-RU",
+                                                "POLLY_VOICE_ID": "Tatyana",
+                                                "POLLY_JOBS_SNS_ARN":sns_topic.topic_arn
+                                            },
+                                    )
+
+
         #Create an SQS event source for Lambda
-        #sqs_event_source = lambda_event_source.SqsEventSource(queue)
+        sqs_event_source = lambda_event_source.SqsEventSource(queue)
 
         #Add SQS event source to the Lambda function
-        #processTransactionResultLambda.add_event_source(sqs_event_source)                              
+        convertSubtitlesToPollyLambda.add_event_source(sqs_event_source)                              

@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/e76c23d58e0eeb366ac48e33324569550b4609441ed15053ed8f15948827c0f9.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/e4065a79ba50db7bf40ba28131b8502537034ead35ca695e8d22b7fd8d0e8847.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -172,6 +172,12 @@
             "data": "S3CopyTargetPolicy17A699BC"
           }
         ],
+        "/VideoDubbingStack/TranslateTextPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TranslateTextPolicyAECBBE52"
+          }
+        ],
         "/VideoDubbingStack/VideoDubbingDLQ/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -200,6 +206,54 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "VideoDubbingTranscribeEventCompleted8766254A"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingPollyJobs/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingPollyJobsD6E6C2C7"
+          }
+        ],
+        "/VideoDubbingStack/ConvertSubtitlesToPollyLambdaRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ConvertSubtitlesToPollyLambdaRole885734CA"
+          }
+        ],
+        "/VideoDubbingStack/ConvertSubtitlesToPollyLambdaRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ConvertSubtitlesToPollyLambdaRoleDefaultPolicyF7A517DF"
+          }
+        ],
+        "/VideoDubbingStack/SqsGetMessagePolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SqsGetMessagePolicyAD1F9B64"
+          }
+        ],
+        "/VideoDubbingStack/PollyStartSpeechSynthesisTaskPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PollyStartSpeechSynthesisTaskPolicy9EA3B680"
+          }
+        ],
+        "/VideoDubbingStack/DynamoPutItemPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoPutItemPolicy16302363"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingConvertSubsToPolly/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingConvertSubsToPollyCA61E95F"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingConvertSubsToPolly/SqsEventSource:VideoDubbingStackSrtToPollyF5A9260D/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingConvertSubsToPollySqsEventSourceVideoDubbingStackSrtToPollyF5A9260DE0086275"
           }
         ],
         "/VideoDubbingStack/CDKMetadata/Default": [
