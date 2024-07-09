@@ -1,0 +1,239 @@
+{
+  "version": "36.0.0",
+  "artifacts": {
+    "VideoDubbingStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "VideoDubbingStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "VideoDubbingStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "VideoDubbingStack.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/e76c23d58e0eeb366ac48e33324569550b4609441ed15053ed8f15948827c0f9.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "VideoDubbingStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "VideoDubbingStack.assets"
+      ],
+      "metadata": {
+        "/VideoDubbingStack/TranscribeForDubbingLambdaRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TranscribeForDubbingLambdaRoleEBA9A27D"
+          }
+        ],
+        "/VideoDubbingStack/TranscribeForDubbingLambdaRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TranscribeForDubbingLambdaRoleDefaultPolicy996C6622"
+          }
+        ],
+        "/VideoDubbingStack/lambda_function/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "lambdafunction45C982D3"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingFilesSource/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingFilesSource65A974C7"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingFilesSource/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingFilesSourcePolicy9AA265B9"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingFilesSource/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingFilesSourceAutoDeleteObjectsCustomResourceB633A2B8"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingFilesSource/Notifications/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingFilesSourceNotificationsF0B19EC4"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingFilesSource/AllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingFilesSourceAllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB08C58218"
+          }
+        ],
+        "/VideoDubbingStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/VideoDubbingStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingStaging/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingStagingCD98B579"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingStaging/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingStagingPolicyF285A143"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingStaging/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingStagingAutoDeleteObjectsCustomResource30B184CD"
+          }
+        ],
+        "/VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC"
+          }
+        ],
+        "/VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36"
+          }
+        ],
+        "/VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbungStatus/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbungStatusBC5B51B6"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbungPollyJobStatus/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbungPollyJobStatus67E8C401"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingTranscribeEvent/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingTranscribeEvent842FCAF9"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingTranscribeEvent/AllowEventRuleVideoDubbingStackVideoDubbingTranscribeEventCompletedE2CA3183": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingTranscribeEventAllowEventRuleVideoDubbingStackVideoDubbingTranscribeEventCompletedE2CA318333F7BA77"
+          }
+        ],
+        "/VideoDubbingStack/SummarizeLambdaRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SummarizeLambdaRole4DE425CC"
+          }
+        ],
+        "/VideoDubbingStack/S3CopySourcePolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "S3CopySourcePolicy925A6918"
+          }
+        ],
+        "/VideoDubbingStack/S3CopyTargetPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "S3CopyTargetPolicy17A699BC"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingDLQ/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingDLQFF6409FE"
+          }
+        ],
+        "/VideoDubbingStack/SrtToPolly/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SrtToPollyE9339DB3"
+          }
+        ],
+        "/VideoDubbingStack/SqsPutMessagePolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SqsPutMessagePolicyB48DC4CB"
+          }
+        ],
+        "/VideoDubbingStack/getTranscribeJobPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "getTranscribeJobPolicy5B728626"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingTranscribeEventCompleted/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingTranscribeEventCompleted8766254A"
+          }
+        ],
+        "/VideoDubbingStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/VideoDubbingStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/VideoDubbingStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/VideoDubbingStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "VideoDubbingStack"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}

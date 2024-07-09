@@ -1,0 +1,1272 @@
+{
+  "version": "tree-0.1",
+  "tree": {
+    "id": "App",
+    "path": "",
+    "children": {
+      "VideoDubbingStack": {
+        "id": "VideoDubbingStack",
+        "path": "VideoDubbingStack",
+        "children": {
+          "TranscribeForDubbingLambdaRole": {
+            "id": "TranscribeForDubbingLambdaRole",
+            "path": "VideoDubbingStack/TranscribeForDubbingLambdaRole",
+            "children": {
+              "ImportTranscribeForDubbingLambdaRole": {
+                "id": "ImportTranscribeForDubbingLambdaRole",
+                "path": "VideoDubbingStack/TranscribeForDubbingLambdaRole/ImportTranscribeForDubbingLambdaRole",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.133.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/TranscribeForDubbingLambdaRole/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "managedPolicyArns": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                  "version": "2.133.0"
+                }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "VideoDubbingStack/TranscribeForDubbingLambdaRole/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "VideoDubbingStack/TranscribeForDubbingLambdaRole/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "transcribe:StartTranscriptionJob",
+                              "Effect": "Allow",
+                              "Resource": "*"
+                            },
+                            {
+                              "Action": [
+                                "s3:GetObject",
+                                "s3:PutObject"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": {
+                                "Fn::Join": [
+                                  "",
+                                  [
+                                    {
+                                      "Fn::GetAtt": [
+                                        "VideoDubbingFilesSource65A974C7",
+                                        "Arn"
+                                      ]
+                                    },
+                                    "/*"
+                                  ]
+                                ]
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "TranscribeForDubbingLambdaRoleDefaultPolicy996C6622",
+                        "roles": [
+                          {
+                            "Ref": "TranscribeForDubbingLambdaRoleEBA9A27D"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                      "version": "2.133.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Policy",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Role",
+              "version": "2.133.0"
+            }
+          },
+          "lambda_function": {
+            "id": "lambda_function",
+            "path": "VideoDubbingStack/lambda_function",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "VideoDubbingStack/lambda_function/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "VideoDubbingStack/lambda_function/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.133.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "VideoDubbingStack/lambda_function/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.133.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.133.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/lambda_function/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": {
+                        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+                      },
+                      "s3Key": "166365b387786ac1b4349fcb5df3108e8f64ac9bc6470b08afba006fba44cded.zip"
+                    },
+                    "environment": {
+                      "variables": {
+                        "AUDIO_LANGUAGE": "en-US"
+                      }
+                    },
+                    "handler": "video-dubbing-start-transcribe.lambda_handler",
+                    "memorySize": 256,
+                    "role": {
+                      "Fn::GetAtt": [
+                        "TranscribeForDubbingLambdaRoleEBA9A27D",
+                        "Arn"
+                      ]
+                    },
+                    "runtime": "python3.11",
+                    "timeout": 30
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.133.0"
+            }
+          },
+          "VideoDubbingFilesSource": {
+            "id": "VideoDubbingFilesSource",
+            "path": "VideoDubbingStack/VideoDubbingFilesSource",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/VideoDubbingFilesSource/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::S3::Bucket",
+                  "aws:cdk:cloudformation:props": {
+                    "tags": [
+                      {
+                        "key": "aws-cdk:auto-delete-objects",
+                        "value": "true"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.CfnBucket",
+                  "version": "2.133.0"
+                }
+              },
+              "Policy": {
+                "id": "Policy",
+                "path": "VideoDubbingStack/VideoDubbingFilesSource/Policy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "VideoDubbingStack/VideoDubbingFilesSource/Policy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::S3::BucketPolicy",
+                      "aws:cdk:cloudformation:props": {
+                        "bucket": {
+                          "Ref": "VideoDubbingFilesSource65A974C7"
+                        },
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "s3:DeleteObject*",
+                                "s3:GetBucket*",
+                                "s3:List*",
+                                "s3:PutBucketPolicy"
+                              ],
+                              "Effect": "Allow",
+                              "Principal": {
+                                "AWS": {
+                                  "Fn::GetAtt": [
+                                    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+                                    "Arn"
+                                  ]
+                                }
+                              },
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "VideoDubbingFilesSource65A974C7",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "VideoDubbingFilesSource65A974C7",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.CfnBucketPolicy",
+                      "version": "2.133.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.BucketPolicy",
+                  "version": "2.133.0"
+                }
+              },
+              "AutoDeleteObjectsCustomResource": {
+                "id": "AutoDeleteObjectsCustomResource",
+                "path": "VideoDubbingStack/VideoDubbingFilesSource/AutoDeleteObjectsCustomResource",
+                "children": {
+                  "Default": {
+                    "id": "Default",
+                    "path": "VideoDubbingStack/VideoDubbingFilesSource/AutoDeleteObjectsCustomResource/Default",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.CfnResource",
+                      "version": "2.133.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CustomResource",
+                  "version": "2.133.0"
+                }
+              },
+              "Notifications": {
+                "id": "Notifications",
+                "path": "VideoDubbingStack/VideoDubbingFilesSource/Notifications",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "VideoDubbingStack/VideoDubbingFilesSource/Notifications/Resource",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.CfnResource",
+                      "version": "2.133.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "constructs.Construct",
+                  "version": "10.3.0"
+                }
+              },
+              "AllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB": {
+                "id": "AllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB",
+                "path": "VideoDubbingStack/VideoDubbingFilesSource/AllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                  "aws:cdk:cloudformation:props": {
+                    "action": "lambda:InvokeFunction",
+                    "functionName": {
+                      "Fn::GetAtt": [
+                        "lambdafunction45C982D3",
+                        "Arn"
+                      ]
+                    },
+                    "principal": "s3.amazonaws.com",
+                    "sourceAccount": {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "sourceArn": {
+                      "Fn::GetAtt": [
+                        "VideoDubbingFilesSource65A974C7",
+                        "Arn"
+                      ]
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_s3.Bucket",
+              "version": "2.133.0"
+            }
+          },
+          "Custom::S3AutoDeleteObjectsCustomResourceProvider": {
+            "id": "Custom::S3AutoDeleteObjectsCustomResourceProvider",
+            "path": "VideoDubbingStack/Custom::S3AutoDeleteObjectsCustomResourceProvider",
+            "children": {
+              "Staging": {
+                "id": "Staging",
+                "path": "VideoDubbingStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Staging",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.AssetStaging",
+                  "version": "2.133.0"
+                }
+              },
+              "Role": {
+                "id": "Role",
+                "path": "VideoDubbingStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.133.0"
+                }
+              },
+              "Handler": {
+                "id": "Handler",
+                "path": "VideoDubbingStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CustomResourceProviderBase",
+              "version": "2.133.0"
+            }
+          },
+          "VideoDubbingStaging": {
+            "id": "VideoDubbingStaging",
+            "path": "VideoDubbingStack/VideoDubbingStaging",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/VideoDubbingStaging/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::S3::Bucket",
+                  "aws:cdk:cloudformation:props": {
+                    "tags": [
+                      {
+                        "key": "aws-cdk:auto-delete-objects",
+                        "value": "true"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.CfnBucket",
+                  "version": "2.133.0"
+                }
+              },
+              "Policy": {
+                "id": "Policy",
+                "path": "VideoDubbingStack/VideoDubbingStaging/Policy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "VideoDubbingStack/VideoDubbingStaging/Policy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::S3::BucketPolicy",
+                      "aws:cdk:cloudformation:props": {
+                        "bucket": {
+                          "Ref": "VideoDubbingStagingCD98B579"
+                        },
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "s3:DeleteObject*",
+                                "s3:GetBucket*",
+                                "s3:List*",
+                                "s3:PutBucketPolicy"
+                              ],
+                              "Effect": "Allow",
+                              "Principal": {
+                                "AWS": {
+                                  "Fn::GetAtt": [
+                                    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+                                    "Arn"
+                                  ]
+                                }
+                              },
+                              "Resource": [
+                                {
+                                  "Fn::GetAtt": [
+                                    "VideoDubbingStagingCD98B579",
+                                    "Arn"
+                                  ]
+                                },
+                                {
+                                  "Fn::Join": [
+                                    "",
+                                    [
+                                      {
+                                        "Fn::GetAtt": [
+                                          "VideoDubbingStagingCD98B579",
+                                          "Arn"
+                                        ]
+                                      },
+                                      "/*"
+                                    ]
+                                  ]
+                                }
+                              ]
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.CfnBucketPolicy",
+                      "version": "2.133.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.BucketPolicy",
+                  "version": "2.133.0"
+                }
+              },
+              "AutoDeleteObjectsCustomResource": {
+                "id": "AutoDeleteObjectsCustomResource",
+                "path": "VideoDubbingStack/VideoDubbingStaging/AutoDeleteObjectsCustomResource",
+                "children": {
+                  "Default": {
+                    "id": "Default",
+                    "path": "VideoDubbingStack/VideoDubbingStaging/AutoDeleteObjectsCustomResource/Default",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.CfnResource",
+                      "version": "2.133.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CustomResource",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_s3.Bucket",
+              "version": "2.133.0"
+            }
+          },
+          "BucketNotificationsHandler050a0587b7544547bf325f094a3db834": {
+            "id": "BucketNotificationsHandler050a0587b7544547bf325f094a3db834",
+            "path": "VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834",
+            "children": {
+              "Role": {
+                "id": "Role",
+                "path": "VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role",
+                "children": {
+                  "ImportRole": {
+                    "id": "ImportRole",
+                    "path": "VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/ImportRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.133.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "lambda.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "managedPolicyArns": [
+                          {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "arn:",
+                                {
+                                  "Ref": "AWS::Partition"
+                                },
+                                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                              ]
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.133.0"
+                    }
+                  },
+                  "DefaultPolicy": {
+                    "id": "DefaultPolicy",
+                    "path": "VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/DefaultPolicy",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/DefaultPolicy/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                          "aws:cdk:cloudformation:props": {
+                            "policyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": "s3:PutBucketNotification",
+                                  "Effect": "Allow",
+                                  "Resource": "*"
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "policyName": "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36",
+                            "roles": [
+                              {
+                                "Ref": "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC"
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                          "version": "2.133.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.Policy",
+                      "version": "2.133.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Role",
+                  "version": "2.133.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Resource",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "constructs.Construct",
+              "version": "10.3.0"
+            }
+          },
+          "VideoDubbungStatus": {
+            "id": "VideoDubbungStatus",
+            "path": "VideoDubbingStack/VideoDubbungStatus",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/VideoDubbungStatus/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::DynamoDB::GlobalTable",
+                  "aws:cdk:cloudformation:props": {
+                    "attributeDefinitions": [
+                      {
+                        "attributeName": "dubbing_job_id",
+                        "attributeType": "S"
+                      }
+                    ],
+                    "billingMode": "PAY_PER_REQUEST",
+                    "keySchema": [
+                      {
+                        "attributeName": "dubbing_job_id",
+                        "keyType": "HASH"
+                      }
+                    ],
+                    "replicas": [
+                      {
+                        "region": {
+                          "Ref": "AWS::Region"
+                        }
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_dynamodb.CfnGlobalTable",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_dynamodb.TableV2",
+              "version": "2.133.0"
+            }
+          },
+          "VideoDubbungPollyJobStatus": {
+            "id": "VideoDubbungPollyJobStatus",
+            "path": "VideoDubbingStack/VideoDubbungPollyJobStatus",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/VideoDubbungPollyJobStatus/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::DynamoDB::GlobalTable",
+                  "aws:cdk:cloudformation:props": {
+                    "attributeDefinitions": [
+                      {
+                        "attributeName": "polly_job_id",
+                        "attributeType": "S"
+                      }
+                    ],
+                    "billingMode": "PAY_PER_REQUEST",
+                    "globalSecondaryIndexes": [
+                      {
+                        "indexName": "dubbing_job_id_index",
+                        "keySchema": [
+                          {
+                            "attributeName": "polly_job_id",
+                            "keyType": "HASH"
+                          }
+                        ],
+                        "projection": {
+                          "projectionType": "ALL"
+                        }
+                      }
+                    ],
+                    "keySchema": [
+                      {
+                        "attributeName": "polly_job_id",
+                        "keyType": "HASH"
+                      }
+                    ],
+                    "replicas": [
+                      {
+                        "region": {
+                          "Ref": "AWS::Region"
+                        },
+                        "globalSecondaryIndexes": [
+                          {
+                            "indexName": "dubbing_job_id_index"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_dynamodb.CfnGlobalTable",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_dynamodb.TableV2",
+              "version": "2.133.0"
+            }
+          },
+          "VideoDubbingTranscribeEvent": {
+            "id": "VideoDubbingTranscribeEvent",
+            "path": "VideoDubbingStack/VideoDubbingTranscribeEvent",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/VideoDubbingTranscribeEvent/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Events::Rule",
+                  "aws:cdk:cloudformation:props": {
+                    "description": "Completed Transcription Jobs",
+                    "eventPattern": {
+                      "detail": {
+                        "TranscriptionJobStatus": [
+                          "COMPLETED"
+                        ]
+                      },
+                      "source": [
+                        "aws.transcribe"
+                      ]
+                    },
+                    "state": "ENABLED",
+                    "targets": [
+                      {
+                        "id": "Target0",
+                        "arn": {
+                          "Fn::GetAtt": [
+                            "VideoDubbingTranscribeEventCompleted8766254A",
+                            "Arn"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_events.CfnRule",
+                  "version": "2.133.0"
+                }
+              },
+              "AllowEventRuleVideoDubbingStackVideoDubbingTranscribeEventCompletedE2CA3183": {
+                "id": "AllowEventRuleVideoDubbingStackVideoDubbingTranscribeEventCompletedE2CA3183",
+                "path": "VideoDubbingStack/VideoDubbingTranscribeEvent/AllowEventRuleVideoDubbingStackVideoDubbingTranscribeEventCompletedE2CA3183",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                  "aws:cdk:cloudformation:props": {
+                    "action": "lambda:InvokeFunction",
+                    "functionName": {
+                      "Fn::GetAtt": [
+                        "VideoDubbingTranscribeEventCompleted8766254A",
+                        "Arn"
+                      ]
+                    },
+                    "principal": "events.amazonaws.com",
+                    "sourceArn": {
+                      "Fn::GetAtt": [
+                        "VideoDubbingTranscribeEvent842FCAF9",
+                        "Arn"
+                      ]
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_events.Rule",
+              "version": "2.133.0"
+            }
+          },
+          "SummarizeLambdaRole": {
+            "id": "SummarizeLambdaRole",
+            "path": "VideoDubbingStack/SummarizeLambdaRole",
+            "children": {
+              "ImportSummarizeLambdaRole": {
+                "id": "ImportSummarizeLambdaRole",
+                "path": "VideoDubbingStack/SummarizeLambdaRole/ImportSummarizeLambdaRole",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.133.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/SummarizeLambdaRole/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "managedPolicyArns": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Role",
+              "version": "2.133.0"
+            }
+          },
+          "S3CopySourcePolicy": {
+            "id": "S3CopySourcePolicy",
+            "path": "VideoDubbingStack/S3CopySourcePolicy",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/S3CopySourcePolicy/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": [
+                            "s3:GetObject",
+                            "s3:ListBucket"
+                          ],
+                          "Effect": "Allow",
+                          "Resource": [
+                            {
+                              "Fn::GetAtt": [
+                                "VideoDubbingFilesSource65A974C7",
+                                "Arn"
+                              ]
+                            },
+                            {
+                              "Fn::Join": [
+                                "",
+                                [
+                                  {
+                                    "Fn::GetAtt": [
+                                      "VideoDubbingFilesSource65A974C7",
+                                      "Arn"
+                                    ]
+                                  },
+                                  "/*"
+                                ]
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "S3CopySourcePolicy925A6918",
+                    "roles": [
+                      {
+                        "Ref": "SummarizeLambdaRole4DE425CC"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.133.0"
+            }
+          },
+          "S3CopyTargetPolicy": {
+            "id": "S3CopyTargetPolicy",
+            "path": "VideoDubbingStack/S3CopyTargetPolicy",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/S3CopyTargetPolicy/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": [
+                            "s3:GetObject",
+                            "s3:PutObject"
+                          ],
+                          "Effect": "Allow",
+                          "Resource": [
+                            {
+                              "Fn::GetAtt": [
+                                "VideoDubbingStagingCD98B579",
+                                "Arn"
+                              ]
+                            },
+                            {
+                              "Fn::Join": [
+                                "",
+                                [
+                                  {
+                                    "Fn::GetAtt": [
+                                      "VideoDubbingStagingCD98B579",
+                                      "Arn"
+                                    ]
+                                  },
+                                  "/*"
+                                ]
+                              ]
+                            }
+                          ]
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "S3CopyTargetPolicy17A699BC",
+                    "roles": [
+                      {
+                        "Ref": "SummarizeLambdaRole4DE425CC"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.133.0"
+            }
+          },
+          "VideoDubbingDLQ": {
+            "id": "VideoDubbingDLQ",
+            "path": "VideoDubbingStack/VideoDubbingDLQ",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/VideoDubbingDLQ/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::SQS::Queue",
+                  "aws:cdk:cloudformation:props": {
+                    "visibilityTimeout": 900
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_sqs.CfnQueue",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_sqs.Queue",
+              "version": "2.133.0"
+            }
+          },
+          "SrtToPolly": {
+            "id": "SrtToPolly",
+            "path": "VideoDubbingStack/SrtToPolly",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/SrtToPolly/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::SQS::Queue",
+                  "aws:cdk:cloudformation:props": {
+                    "receiveMessageWaitTimeSeconds": 20,
+                    "redrivePolicy": {
+                      "deadLetterTargetArn": {
+                        "Fn::GetAtt": [
+                          "VideoDubbingDLQFF6409FE",
+                          "Arn"
+                        ]
+                      },
+                      "maxReceiveCount": 5
+                    },
+                    "visibilityTimeout": 120
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_sqs.CfnQueue",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_sqs.Queue",
+              "version": "2.133.0"
+            }
+          },
+          "SqsPutMessagePolicy": {
+            "id": "SqsPutMessagePolicy",
+            "path": "VideoDubbingStack/SqsPutMessagePolicy",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/SqsPutMessagePolicy/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sqs:SendMessage",
+                          "Effect": "Allow",
+                          "Resource": {
+                            "Fn::GetAtt": [
+                              "SrtToPollyE9339DB3",
+                              "Arn"
+                            ]
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "SqsPutMessagePolicyB48DC4CB",
+                    "roles": [
+                      {
+                        "Ref": "SummarizeLambdaRole4DE425CC"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.133.0"
+            }
+          },
+          "getTranscribeJobPolicy": {
+            "id": "getTranscribeJobPolicy",
+            "path": "VideoDubbingStack/getTranscribeJobPolicy",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/getTranscribeJobPolicy/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "transcribe:GetTranscriptionJob",
+                          "Effect": "Allow",
+                          "Resource": "*"
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "getTranscribeJobPolicy5B728626",
+                    "roles": [
+                      {
+                        "Ref": "SummarizeLambdaRole4DE425CC"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.133.0"
+            }
+          },
+          "VideoDubbingTranscribeEventCompleted": {
+            "id": "VideoDubbingTranscribeEventCompleted",
+            "path": "VideoDubbingStack/VideoDubbingTranscribeEventCompleted",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "VideoDubbingStack/VideoDubbingTranscribeEventCompleted/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "VideoDubbingStack/VideoDubbingTranscribeEventCompleted/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.133.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "VideoDubbingStack/VideoDubbingTranscribeEventCompleted/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.133.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.133.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/VideoDubbingTranscribeEventCompleted/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": {
+                        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+                      },
+                      "s3Key": "166365b387786ac1b4349fcb5df3108e8f64ac9bc6470b08afba006fba44cded.zip"
+                    },
+                    "environment": {
+                      "variables": {
+                        "AUDIO_LANGUAGE_SOURCE": "en",
+                        "AUDIO_LANGUAGE_TARGET": "ru",
+                        "SQS_QUEUE_NAME": {
+                          "Fn::GetAtt": [
+                            "SrtToPollyE9339DB3",
+                            "QueueName"
+                          ]
+                        },
+                        "STAGING_BUCKET_NAME": {
+                          "Ref": "VideoDubbingStagingCD98B579"
+                        }
+                      }
+                    },
+                    "handler": "process-transcribe-result.lambda_handler",
+                    "memorySize": 512,
+                    "role": {
+                      "Fn::GetAtt": [
+                        "SummarizeLambdaRole4DE425CC",
+                        "Arn"
+                      ]
+                    },
+                    "runtime": "python3.11",
+                    "timeout": 60
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.133.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "VideoDubbingStack/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "VideoDubbingStack/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.133.0"
+                }
+              },
+              "Condition": {
+                "id": "Condition",
+                "path": "VideoDubbingStack/CDKMetadata/Condition",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnCondition",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "constructs.Construct",
+              "version": "10.3.0"
+            }
+          },
+          "BootstrapVersion": {
+            "id": "BootstrapVersion",
+            "path": "VideoDubbingStack/BootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnParameter",
+              "version": "2.133.0"
+            }
+          },
+          "CheckBootstrapVersion": {
+            "id": "CheckBootstrapVersion",
+            "path": "VideoDubbingStack/CheckBootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnRule",
+              "version": "2.133.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "aws-cdk-lib.Stack",
+          "version": "2.133.0"
+        }
+      },
+      "Tree": {
+        "id": "Tree",
+        "path": "Tree",
+        "constructInfo": {
+          "fqn": "constructs.Construct",
+          "version": "10.3.0"
+        }
+      }
+    },
+    "constructInfo": {
+      "fqn": "aws-cdk-lib.App",
+      "version": "2.133.0"
+    }
+  }
+}

@@ -1,0 +1,181 @@
+from aws_cdk import (
+    aws_lambda as _lambda,
+    aws_s3 as s3,
+    aws_iam as iam,
+    RemovalPolicy,
+    Duration,
+    aws_sqs as sqs,
+    CfnOutput,
+    CfnParameter,
+    aws_dynamodb as dynamo,
+    aws_s3_notifications,
+    aws_sns_subscriptions as subscriptions,
+    aws_sns as sns,
+    aws_events as events,
+    aws_events_targets as targets,
+    Stack,
+    aws_lambda_event_sources as lambda_event_source
+)
+from constructs import Construct
+import uuid
+import aws_cdk as cdk
+from aws_cdk.aws_iam import PolicyStatement
+class VideoDubbingStack(Stack):
+
+    def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
+        super().__init__(scope, construct_id, **kwargs)
+
+        
+        transcribeLambdaRole = iam.Role(self, "TranscribeForDubbingLambdaRole",
+                     assumed_by=iam.ServicePrincipal("lambda.amazonaws.com")
+                                    )
+        transcribeLambdaRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
+ 
+        functionAudionToText = _lambda.Function(self, "lambda_function",
+                                    runtime=_lambda.Runtime.PYTHON_3_11,
+                                    handler="video-dubbing-start-transcribe.lambda_handler",
+                                    code=_lambda.Code.from_asset("./lambda/transcribe"),
+                                    timeout=cdk.Duration.seconds(30),
+                                    memory_size=256,
+                                    environment={ # ADD THIS, FILL IT FOR ACTUAL VALUE 
+                                                "AUDIO_LANGUAGE": "en-US"
+                                            },
+                                    role = transcribeLambdaRole
+                                    )
+        #Bucket to upload the video file
+        sourceBucket = s3.Bucket(self, "VideoDubbingFilesSource", 
+                                 versioned=False,
+                                 removal_policy=RemovalPolicy.DESTROY,
+                                 auto_delete_objects=True)
+        
+        
+        #Staging bucket
+        stagingBucket = s3.Bucket(self, "VideoDubbingStaging", 
+                                 versioned=False,
+                                 removal_policy=RemovalPolicy.DESTROY,
+                                 auto_delete_objects=True)
+        
+
+        transcribeLambdaRole.add_to_policy(iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                resources=["*"],
+                actions=["transcribe:StartTranscriptionJob"]
+                
+            ))
+
+        transcribeLambdaRole.add_to_policy(iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                resources=[sourceBucket.bucket_arn+"/*"],
+                actions=["s3:PutObject","s3:GetObject"]
+                
+            ))   
+
+        # create s3 notification for lambda function
+        notification = aws_s3_notifications.LambdaDestination(functionAudionToText)
+
+        # assign notification for the s3 event type (ex: OBJECT_CREATED)
+        sourceBucket.add_event_notification(s3.EventType.OBJECT_CREATED, notification)    
+
+        table = dynamo.TableV2(self, "VideoDubbungStatus",
+              partition_key=dynamo.Attribute(name="dubbing_job_id", type=dynamo.AttributeType.STRING),
+              removal_policy= RemovalPolicy.DESTROY,
+              
+        )
+
+        table_polly_job = dynamo.TableV2(self, "VideoDubbungPollyJobStatus",
+              partition_key=dynamo.Attribute(name="polly_job_id", type=dynamo.AttributeType.STRING),
+              removal_policy= RemovalPolicy.DESTROY,
+              
+        )
+        table_polly_job.add_global_secondary_index(
+            index_name= 'dubbing_job_id_index',
+            partition_key= dynamo.Attribute(name="polly_job_id", type=dynamo.AttributeType.STRING)
+        )
+        
+
+        transcribe_event = events.Rule(self, 'VideoDubbingTranscribeEvent',
+                                           description='Completed Transcription Jobs',
+                                           event_pattern=events.EventPattern(source=["aws.transcribe"],
+                                                                             detail={
+                                                                                 "TranscriptionJobStatus": ["COMPLETED"]
+                                                                             }  
+                               ))
+        # Permissions for processTransactionResultLambda
+        processTransactionResultLambdaRole = iam.Role(self, "SummarizeLambdaRole",
+                     assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"))
+        processTransactionResultLambdaRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
+
+        s3CopySourcePolicy = iam.Policy(self, "S3CopySourcePolicy")  
+        s3CopySourcePolicy.add_statements(PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["s3:GetObject","s3:ListBucket"],
+            resources=[sourceBucket.bucket_arn,sourceBucket.bucket_arn+"/*"]
+        )) 
+        processTransactionResultLambdaRole.attach_inline_policy(s3CopySourcePolicy)
+
+        s3CopyTargetPolicy = iam.Policy(self, "S3CopyTargetPolicy")  
+        s3CopyTargetPolicy.add_statements(PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["s3:PutObject","s3:GetObject"],
+            resources=[stagingBucket.bucket_arn,stagingBucket.bucket_arn+"/*"]
+        )) 
+        processTransactionResultLambdaRole.attach_inline_policy(s3CopyTargetPolicy)
+
+        
+        #End Permissions for processTransactionResultLambda
+
+        
+        dlq = sqs.Queue(self, "VideoDubbingDLQ",
+            visibility_timeout=Duration.seconds(900)
+        )
+
+     
+        queue = sqs.Queue(self, "SrtToPolly",
+                visibility_timeout=Duration.seconds(120),
+                receive_message_wait_time=Duration.seconds(20),
+                dead_letter_queue=sqs.DeadLetterQueue(
+                max_receive_count=5,  # Number of retries before sending the message to the DLQ
+                queue=dlq
+            )
+            )
+
+        sqsPutMessagePolicy = iam.Policy(self, "SqsPutMessagePolicy")  
+        sqsPutMessagePolicy.add_statements(PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["sqs:SendMessage"],
+            resources=[queue.queue_arn]
+        )) 
+        processTransactionResultLambdaRole.attach_inline_policy(sqsPutMessagePolicy)
+
+        getTranscribeJobPolicy = iam.Policy(self, "getTranscribeJobPolicy")  
+        getTranscribeJobPolicy.add_statements(PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["transcribe:GetTranscriptionJob"],
+            resources=["*"]
+        )) 
+        processTransactionResultLambdaRole.attach_inline_policy(getTranscribeJobPolicy)
+    
+     
+                                                                   
+        # Lambda that is called when EventBridge identifies that Transcribe Job is over
+        processTransactionResultLambda = _lambda.Function(self, "VideoDubbingTranscribeEventCompleted",
+                                    runtime=_lambda.Runtime.PYTHON_3_11,
+                                    handler="process-transcribe-result.lambda_handler",
+                                    code=_lambda.Code.from_asset("./lambda/transcribe"),
+                                    timeout=cdk.Duration.seconds(60),
+                                    memory_size=512,
+                                    role = processTransactionResultLambdaRole,
+                                    environment={  
+                                                "AUDIO_LANGUAGE_SOURCE": "en",
+                                                "AUDIO_LANGUAGE_TARGET": "ru",
+                                                "SQS_QUEUE_NAME": queue.queue_name,
+                                                "STAGING_BUCKET_NAME": stagingBucket.bucket_name
+                                            },
+                                    )
+        transcribe_event.add_target(targets.LambdaFunction(handler=processTransactionResultLambda)) 
+
+        #Create an SQS event source for Lambda
+        #sqs_event_source = lambda_event_source.SqsEventSource(queue)
+
+        #Add SQS event source to the Lambda function
+        #processTransactionResultLambda.add_event_source(sqs_event_source)                              
