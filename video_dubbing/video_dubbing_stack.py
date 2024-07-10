@@ -89,7 +89,7 @@ class VideoDubbingStack(Stack):
         )
         table_polly_job.add_global_secondary_index(
             index_name= 'dubbing_job_id_index',
-            partition_key= dynamo.Attribute(name="polly_job_id", type=dynamo.AttributeType.STRING)
+            partition_key= dynamo.Attribute(name="dubbing_job_id", type=dynamo.AttributeType.STRING)
         )
         
 
@@ -186,7 +186,7 @@ class VideoDubbingStack(Stack):
 
         convertSubtitlesToPollyLambdaRole = iam.Role(self, "ConvertSubtitlesToPollyLambdaRole",
                      assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"))
-        processTransactionResultLambdaRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
+        convertSubtitlesToPollyLambdaRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
 
 
         sqsPutMessagePolicy = iam.Policy(self, "SqsGetMessagePolicy")  
@@ -213,10 +213,20 @@ class VideoDubbingStack(Stack):
                 )) 
         convertSubtitlesToPollyLambdaRole.attach_inline_policy(dynamoPutItemPolicy)
 
+
+        snsPollyJobNotificationPolict = iam.Policy(self, "SnsPollyJobNotificationPolict") 
+        snsPollyJobNotificationPolict.add_statements(PolicyStatement(
+                    effect=iam.Effect.ALLOW,
+                    actions=["sns:Publish"],
+                    resources=[sns_topic.topic_arn]
+                )) 
+        convertSubtitlesToPollyLambdaRole.attach_inline_policy(snsPollyJobNotificationPolict)
+        convertSubtitlesToPollyLambdaRole.attach_inline_policy(s3CopyTargetPolicy)
+
         # Lambda that is called when EventBridge identifies that Transcribe Job is over
         convertSubtitlesToPollyLambda = _lambda.Function(self, "VideoDubbingConvertSubsToPolly",
                                     runtime=_lambda.Runtime.PYTHON_3_11,
-                                    handler="process-transcribe-result.lambda_handler",
+                                    handler="srt-to-polly.lambda_handler",
                                     code=_lambda.Code.from_asset("./lambda/polly"),
                                     timeout=cdk.Duration.seconds(60),
                                     memory_size=512,

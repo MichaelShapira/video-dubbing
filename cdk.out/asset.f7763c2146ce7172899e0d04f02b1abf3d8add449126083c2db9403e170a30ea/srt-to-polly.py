@@ -105,7 +105,7 @@ def lambda_handler(event, context):
     media_output_bucket = os.environ.get('STAGING_BUCKET_NAME')
     media_output_prefix = f'{unique_id}/polly_output/'
 
-    success = insert_dubbing_status(unique_id, chunks_counter, media_output_bucket, unique_id,video_file)
+    success = insert_dubbing_status(unique_id, chunks_counter, media_output_bucket, media_output_prefix,video_file)
     if success:
         print(f"Record inserted successfully into Dubbing_status table with id {unique_id}")
     else:

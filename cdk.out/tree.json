@@ -682,6 +682,10 @@
                       {
                         "attributeName": "polly_job_id",
                         "attributeType": "S"
+                      },
+                      {
+                        "attributeName": "dubbing_job_id",
+                        "attributeType": "S"
                       }
                     ],
                     "billingMode": "PAY_PER_REQUEST",
@@ -690,7 +694,7 @@
                         "indexName": "dubbing_job_id_index",
                         "keySchema": [
                           {
-                            "attributeName": "polly_job_id",
+                            "attributeName": "dubbing_job_id",
                             "keyType": "HASH"
                           }
                         ],
@@ -971,6 +975,9 @@
                     "roles": [
                       {
                         "Ref": "SummarizeLambdaRole4DE425CC"
+                      },
+                      {
+                        "Ref": "ConvertSubtitlesToPollyLambdaRole885734CA"
                       }
                     ]
                   }
@@ -1300,7 +1307,21 @@
                         }
                       ],
                       "Version": "2012-10-17"
-                    }
+                    },
+                    "managedPolicyArns": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                          ]
+                        ]
+                      }
+                    ]
                   }
                 },
                 "constructInfo": {
@@ -1503,6 +1524,47 @@
               "version": "2.133.0"
             }
           },
+          "SnsPollyJobNotificationPolict": {
+            "id": "SnsPollyJobNotificationPolict",
+            "path": "VideoDubbingStack/SnsPollyJobNotificationPolict",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/SnsPollyJobNotificationPolict/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sns:Publish",
+                          "Effect": "Allow",
+                          "Resource": {
+                            "Ref": "VideoDubbingPollyJobsD6E6C2C7"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "SnsPollyJobNotificationPolictE8C69547",
+                    "roles": [
+                      {
+                        "Ref": "ConvertSubtitlesToPollyLambdaRole885734CA"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.133.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.133.0"
+            }
+          },
           "VideoDubbingConvertSubsToPolly": {
             "id": "VideoDubbingConvertSubsToPolly",
             "path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly",
@@ -1543,7 +1605,7 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                       },
-                      "s3Key": "8772d9a62a84b8d62bf345fa556970310db2affd222a7e17207e599123d91c58.zip"
+                      "s3Key": "ed7a7cd9e5424f8fbd9de63c49ee42ea72998eee6a48d4e09c369a258dadc01c.zip"
                     },
                     "environment": {
                       "variables": {
@@ -1563,7 +1625,7 @@
                         }
                       }
                     },
-                    "handler": "process-transcribe-result.lambda_handler",
+                    "handler": "srt-to-polly.lambda_handler",
                     "memorySize": 512,
                     "role": {
                       "Fn::GetAtt": [

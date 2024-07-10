@@ -548,6 +548,10 @@
      {
       "AttributeName": "polly_job_id",
       "AttributeType": "S"
+     },
+     {
+      "AttributeName": "dubbing_job_id",
+      "AttributeType": "S"
      }
     ],
     "BillingMode": "PAY_PER_REQUEST",
@@ -556,7 +560,7 @@
       "IndexName": "dubbing_job_id_index",
       "KeySchema": [
        {
-        "AttributeName": "polly_job_id",
+        "AttributeName": "dubbing_job_id",
         "KeyType": "HASH"
        }
       ],
@@ -766,6 +770,9 @@
     "Roles": [
      {
       "Ref": "SummarizeLambdaRole4DE425CC"
+     },
+     {
+      "Ref": "ConvertSubtitlesToPollyLambdaRole885734CA"
      }
     ]
    },
@@ -950,7 +957,21 @@
       }
      ],
      "Version": "2012-10-17"
-    }
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
    },
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/ConvertSubtitlesToPollyLambdaRole/Resource"
@@ -1085,6 +1106,32 @@
     "aws:cdk:path": "VideoDubbingStack/DynamoPutItemPolicy/Resource"
    }
   },
+  "SnsPollyJobNotificationPolictE8C69547": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sns:Publish",
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "VideoDubbingPollyJobsD6E6C2C7"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "SnsPollyJobNotificationPolictE8C69547",
+    "Roles": [
+     {
+      "Ref": "ConvertSubtitlesToPollyLambdaRole885734CA"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/SnsPollyJobNotificationPolict/Resource"
+   }
+  },
   "VideoDubbingConvertSubsToPollyCA61E95F": {
    "Type": "AWS::Lambda::Function",
    "Properties": {
@@ -1092,7 +1139,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "8772d9a62a84b8d62bf345fa556970310db2affd222a7e17207e599123d91c58.zip"
+     "S3Key": "ed7a7cd9e5424f8fbd9de63c49ee42ea72998eee6a48d4e09c369a258dadc01c.zip"
     },
     "Environment": {
      "Variables": {
@@ -1112,7 +1159,7 @@
       }
      }
     },
-    "Handler": "process-transcribe-result.lambda_handler",
+    "Handler": "srt-to-polly.lambda_handler",
     "MemorySize": 512,
     "Role": {
      "Fn::GetAtt": [
@@ -1129,7 +1176,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly/Resource",
-    "aws:asset:path": "asset.8772d9a62a84b8d62bf345fa556970310db2affd222a7e17207e599123d91c58",
+    "aws:asset:path": "asset.ed7a7cd9e5424f8fbd9de63c49ee42ea72998eee6a48d4e09c369a258dadc01c",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }

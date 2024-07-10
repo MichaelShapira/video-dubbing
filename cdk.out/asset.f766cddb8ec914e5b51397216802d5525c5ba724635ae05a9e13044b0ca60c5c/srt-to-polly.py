@@ -34,7 +34,7 @@ def insert_dubbing_polly_job(polly_job_id, dubbing_job_id,sequence,start_time):
 
 
 
-def run_polly_job(text, duration,unique_id,target_bucket,target_bucket_key):
+def run_polly_job(text, duration,unique_id):
 
     polly_text=f"<speak><prosody amazon:max-duration=\"{duration}ms\">{text}</prosody></speak>"
     
@@ -44,8 +44,8 @@ def run_polly_job(text, duration,unique_id,target_bucket,target_bucket_key):
         Engine='standard',
         LanguageCode=os.environ.get('POLLY_LANGUAGE_CODE'),
         OutputFormat='mp3',
-        OutputS3BucketName=target_bucket,
-        OutputS3KeyPrefix=target_bucket_key,
+        OutputS3BucketName=os.environ.get('STAGING_BUCKET_NAME'),
+        OutputS3KeyPrefix=f'{unique_id}/polly_output/',
         Text=polly_text,
         TextType='ssml',
         VoiceId=os.environ.get('POLLY_VOICE_ID'),
@@ -103,16 +103,16 @@ def lambda_handler(event, context):
     video_file=translated_srt['video_file']
     chunks_counter = len(translated_srt['subs'])
     media_output_bucket = os.environ.get('STAGING_BUCKET_NAME')
-    media_output_prefix = f'{unique_id}/polly_output/'
+    media_output_prefix = f'{unique_id}_polly/'
 
-    success = insert_dubbing_status(unique_id, chunks_counter, media_output_bucket, unique_id,video_file)
+    success = insert_dubbing_status(unique_id, chunks_counter, media_output_bucket, media_output_prefix,video_file)
     if success:
         print(f"Record inserted successfully into Dubbing_status table with id {unique_id}")
     else:
         print("Failed to insert record into Dubbing_status table")
 
     for srt in translated_srt['subs']:
-        polly_job_id=run_polly_job(srt['text'], srt['duration'],unique_id,media_output_bucket,media_output_prefix)
+        polly_job_id=run_polly_job(srt['text'], srt['duration'],unique_id)
         sequence = srt['sequence']
         start_time=srt['start_time']
         success = insert_dubbing_polly_job(polly_job_id, unique_id,sequence,start_time)
