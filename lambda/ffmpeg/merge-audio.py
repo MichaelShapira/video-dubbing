@@ -1,7 +1,6 @@
 import json
 import subprocess
 import boto3
-import ffmpeg
 import stat
 import os
 from boto3.dynamodb.conditions import Key
@@ -61,7 +60,7 @@ def send_email(subject, content, recipient_email):
 
 def get_dubbing_polly_jobs(dubbing_job_id):
     
-    table = os.environ.get('DYNAMO_POLLY_JOBS_TABLE')
+    table = dynamodb.Table(os.environ.get('DYNAMO_POLLY_JOBS_TABLE'))
 
     try:
         # Assuming the secondary index name is 'MediaIdIndex'
@@ -104,6 +103,10 @@ def parse_s3_url(s3_url):
 
 def lambda_handler(event, context):
     
+    
+    ffmpeg_path=os.environ.get('FFMPEG_PATH')
+
+
     function_start_time = time.time()
     print(f"Start time: {function_start_time}")
     print('Merging audio streams....')
@@ -127,8 +130,7 @@ def lambda_handler(event, context):
     sqs_data = json.loads(sqs_msg)
 
 
-    ffmpeg_path=os.environ.get('FFMPEG_PATH')
-
+   
     video_file = sqs_data['video_file']
 
     bucket_name, bucket_key = parse_s3_url(video_file)
@@ -136,7 +138,7 @@ def lambda_handler(event, context):
     input_video = '/tmp/input_file.mp4'
     output_file = '/tmp/output_file.mp4'
     
-    print(f"Downloading input video from : {bucket_name},{bucket_key}")
+    print(f"Downloading input video from : {bucket_name},{bucket_key} into {input_video}")
         # Download input files from S3
     s3_client.download_file(bucket_name, bucket_key, input_video)
         
@@ -165,8 +167,8 @@ def lambda_handler(event, context):
             s3_client.download_file(bucket, bucketKey, f'/tmp/{sequence}.mp3')
             input_audio = f'/tmp/{sequence}.mp3'
         
-            cmd = f"{ffmpeg_path} -i {input_video} -i {input_audio} -filter_complex '[1:a]adelay={start_time}|{start_time},volume=3,compand[delayed_audio];[0:a][delayed_audio]amix=inputs=2:duration=longest:normalize=0' -c:v copy -c:a aac -b:a 192k {output_file}"
-             print(cmd)
+            cmd = f"{ffmpeg_path} -y -i {input_video} -i {input_audio} -filter_complex '[1:a]adelay={start_time}|{start_time},volume=3,compand[delayed_audio];[0:a][delayed_audio]amix=inputs=2:duration=longest:normalize=0' -c:v copy -c:a aac -b:a 192k {output_file}"
+            print(cmd)
             result = subprocess.run(cmd, shell=True, check=True, capture_output=True, text=True)
             result = subprocess.run(f"mv {output_file} {input_video}", shell=True, check=True, capture_output=True, text=True)
 
@@ -206,26 +208,7 @@ def lambda_handler(event, context):
         )
         print(f"Message deleted successfully")
 
-        
-        return {
-            'statusCode': 200,
-            'body': json.dumps('Video processing completed successfully!')
-        }
     except subprocess.CalledProcessError as e:
         print(f"FFmpeg stderr: {e.stderr}")
-        return {
-            'statusCode': 500,
-            'body': f'Error during video processing: {e.stderr}'
-        }    
-    except ffmpeg.Error as e:
-        print(f"FFmpeg error occurred: {str(e)}")
-        return {
-            'statusCode': 500,
-            'body': json.dumps('Error during video processing')
-        }
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-        return {
-            'statusCode': 500,
-            'body': json.dumps('An unexpected error occurred')
-        }
+       
+ 

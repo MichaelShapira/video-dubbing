@@ -773,6 +773,9 @@
      },
      {
       "Ref": "ConvertSubtitlesToPollyLambdaRole885734CA"
+     },
+     {
+      "Ref": "MergeAudioRoleC83AD2DD"
      }
     ]
    },
@@ -1464,6 +1467,255 @@
     "aws:asset:property": "Content"
    }
   },
+  "MergeAudioRoleC83AD2DD": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/MergeAudioRole/Resource"
+   }
+  },
+  "MergeAudioRoleDefaultPolicyD1089650": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:ChangeMessageVisibility",
+        "sqs:DeleteMessage",
+        "sqs:GetQueueAttributes",
+        "sqs:GetQueueUrl",
+        "sqs:ReceiveMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "MergeAudio2D8ED7DE",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "MergeAudioRoleDefaultPolicyD1089650",
+    "Roles": [
+     {
+      "Ref": "MergeAudioRoleC83AD2DD"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/MergeAudioRole/DefaultPolicy/Resource"
+   }
+  },
+  "SqsGetDeleteMessagePolicy2BA1BDAF": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sqs:DeleteMessage",
+        "sqs:GetQueueUrl"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "SrtToPollyE9339DB3",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "SqsGetDeleteMessagePolicy2BA1BDAF",
+    "Roles": [
+     {
+      "Ref": "MergeAudioRoleC83AD2DD"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/SqsGetDeleteMessagePolicy/Resource"
+   }
+  },
+  "DynamoGetItemPolicy5E689006": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:Query"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "VideoDubbungPollyJobStatus67E8C401",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "VideoDubbungStatusBC5B51B6",
+          "Arn"
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "DynamoGetItemPolicy5E689006",
+    "Roles": [
+     {
+      "Ref": "MergeAudioRoleC83AD2DD"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/DynamoGetItemPolicy/Resource"
+   }
+  },
+  "DynamoQueryIndexPolicyF3BB1650": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "dynamodb:Query",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "VideoDubbungPollyJobStatus67E8C401",
+            "Arn"
+           ]
+          },
+          "/index/dubbing_job_id_index"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "DynamoQueryIndexPolicyF3BB1650",
+    "Roles": [
+     {
+      "Ref": "MergeAudioRoleC83AD2DD"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/DynamoQueryIndexPolicy/Resource"
+   }
+  },
+  "SnsEmailNotificationPolicy19E6B7CF": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sns:Publish",
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "VideoDubbingEmail8BE6995A"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "SnsEmailNotificationPolicy19E6B7CF",
+    "Roles": [
+     {
+      "Ref": "MergeAudioRoleC83AD2DD"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/SnsEmailNotificationPolicy/Resource"
+   }
+  },
+  "S3GetSourceAssetPolicy27340AB4": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:GetObject",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "VideoDubbingFilesSource65A974C7",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "VideoDubbingFilesSource65A974C7",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "S3GetSourceAssetPolicy27340AB4",
+    "Roles": [
+     {
+      "Ref": "MergeAudioRoleC83AD2DD"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/S3GetSourceAssetPolicy/Resource"
+   }
+  },
   "MergeAudioLambda236640A9": {
    "Type": "AWS::Lambda::Function",
    "Properties": {
@@ -1471,7 +1723,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "8d23ac70620f8e4dfde34886040e57b6ba3043d09a2aec13a1945bf60320e64e.zip"
+     "S3Key": "a47c239c4b1ed2d3ff6a312eb5dcb01714b7e8ddae015d4a547be0b267261540.zip"
     },
     "Environment": {
      "Variables": {
@@ -1489,24 +1741,47 @@
      }
     },
     "Handler": "merge-audio.lambda_handler",
-    "MemorySize": 128,
+    "Layers": [
+     {
+      "Ref": "FFmpegLayer65FCD2A8"
+     }
+    ],
+    "MemorySize": 1024,
     "Role": {
      "Fn::GetAtt": [
-      "PolyJobCompletedRole832B969F",
+      "MergeAudioRoleC83AD2DD",
       "Arn"
      ]
     },
     "Runtime": "python3.11",
-    "Timeout": 60
+    "Timeout": 900
    },
    "DependsOn": [
-    "PolyJobCompletedRole832B969F"
+    "MergeAudioRoleDefaultPolicyD1089650",
+    "MergeAudioRoleC83AD2DD"
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/MergeAudioLambda/Resource",
-    "aws:asset:path": "asset.8d23ac70620f8e4dfde34886040e57b6ba3043d09a2aec13a1945bf60320e64e",
+    "aws:asset:path": "asset.a47c239c4b1ed2d3ff6a312eb5dcb01714b7e8ddae015d4a547be0b267261540",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
+   }
+  },
+  "MergeAudioLambdaSqsEventSourceVideoDubbingStackMergeAudio17D9525762FF5914": {
+   "Type": "AWS::Lambda::EventSourceMapping",
+   "Properties": {
+    "EventSourceArn": {
+     "Fn::GetAtt": [
+      "MergeAudio2D8ED7DE",
+      "Arn"
+     ]
+    },
+    "FunctionName": {
+     "Ref": "MergeAudioLambda236640A9"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/MergeAudioLambda/SqsEventSource:VideoDubbingStackMergeAudio17D95257/Resource"
    }
   },
   "CDKMetadata": {

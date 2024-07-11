@@ -307,6 +307,7 @@ class VideoDubbingStack(Stack):
                                             }
                                     )
 
+
         sns_topic.add_subscription(subscriptions.LambdaSubscription(polyJobCompletedLambda) )     
 
         sns_email_topic = sns.Topic(self, "VideoDubbingEmail")    
@@ -318,21 +319,79 @@ class VideoDubbingStack(Stack):
                     code=_lambda.Code.from_asset("./lambda/ffmpeg/bin"),
                     compatible_runtimes=[_lambda.Runtime.PYTHON_3_11],
                     description="FFmpeg binary layer"
-)
+                    )
+
+
+        mergeAudioRole = iam.Role(self, "MergeAudioRole",
+                     assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"))
+        mergeAudioRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
+        # read mp3 and put merged content
+        mergeAudioRole.attach_inline_policy(s3CopyTargetPolicy)
+
+
+        sqsGetDeleteMessagePolicy = iam.Policy(self, "SqsGetDeleteMessagePolicy")  
+        sqsGetDeleteMessagePolicy.add_statements(PolicyStatement(
+                            effect=iam.Effect.ALLOW,
+                            actions=["sqs:GetQueueUrl","sqs:DeleteMessage"],
+                            resources=[queue.queue_arn]
+                        ))   
+        mergeAudioRole.attach_inline_policy(sqsGetDeleteMessagePolicy)                
+
+        dynamoGetItemPolicy = iam.Policy(self, "DynamoGetItemPolicy") 
+        dynamoGetItemPolicy.add_statements(PolicyStatement(
+                    effect=iam.Effect.ALLOW,
+                    actions=["dynamodb:GetItem","dynamodb:Query"],
+                    resources=[table.table_arn,table_polly_job.table_arn]
+                )) 
+        mergeAudioRole.attach_inline_policy(dynamoGetItemPolicy)
+
+
+        dynamoQueryIndexItemPolicy = iam.Policy(self, "DynamoQueryIndexPolicy") 
+        dynamoQueryIndexItemPolicy.add_statements(PolicyStatement(
+                    effect=iam.Effect.ALLOW,
+                    actions=["dynamodb:Query"],
+                    resources=[table_polly_job.table_arn+f"/index/{dynamo_polly_job_index_name}"]
+                )) 
+        mergeAudioRole.attach_inline_policy(dynamoQueryIndexItemPolicy)
+
+
+        snsEmailNotificationPolicy = iam.Policy(self, "SnsEmailNotificationPolicy") 
+        snsEmailNotificationPolicy.add_statements(PolicyStatement(
+                    effect=iam.Effect.ALLOW,
+                    actions=["sns:Publish"],
+                    resources=[sns_email_topic.topic_arn]
+                ))
+        mergeAudioRole.attach_inline_policy(snsEmailNotificationPolicy)   
+
+        s3GetSourceAssetPolicy = iam.Policy(self, "S3GetSourceAssetPolicy")  
+        s3GetSourceAssetPolicy.add_statements(PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["s3:GetObject"],
+            resources=[sourceBucket.bucket_arn,sourceBucket.bucket_arn+"/*"]
+        ))     
+        mergeAudioRole.attach_inline_policy(s3GetSourceAssetPolicy) 
+
         # Lambda that is called when Amazon Polly job completed
         mergeAudioLambda = _lambda.Function(self, "MergeAudioLambda",
                                     runtime=_lambda.Runtime.PYTHON_3_11,
                                     handler="merge-audio.lambda_handler",
                                     code=_lambda.Code.from_asset("./lambda/ffmpeg"),
-                                    timeout=cdk.Duration.seconds(60),
-                                    memory_size=128,
-                                    role = polyJobCompletedRole,
+                                    timeout=cdk.Duration.seconds(900),
+                                    memory_size=1024,
+                                    role = mergeAudioRole,
                                     environment={  
                                                 "DYNAMO_DUBBING_STATUS_TABLE": table.table_name,
                                                 "DYNAMO_POLLY_JOBS_TABLE": table_polly_job.table_name,
                                                 "DYNAMO_POLLY_JOBS_INDEX": dynamo_polly_job_index_name,
                                                 "SNS_EMAIL_TOPIC": sns_email_topic.topic_arn,
                                                 "FFMPEG_PATH": '/var/task/bin/ffmpeg'
-                                            }
+                                            },
+                                     layers=[ffmpeg_layer]          
                                     ) 
-        layers=[ffmpeg_layer]                                                               
+       
+
+        #Create an SQS event source for Lambda
+        sqs_event_source = lambda_event_source.SqsEventSource(queueMergeAudio)
+
+        #Add SQS event source to the Lambda function
+        mergeAudioLambda.add_event_source(sqs_event_source)                                                               

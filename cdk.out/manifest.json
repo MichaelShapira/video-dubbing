@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/53891ac9dddba3bdd4c4525b10f4bee347dac998a3a325c5d181989ef7c4fba1.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a3b23eae2c427dd72e76e516adbaeea0bd31fd755ad379b6bb2f45073044efd9.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -334,10 +334,58 @@
             "data": "FFmpegLayer65FCD2A8"
           }
         ],
+        "/VideoDubbingStack/MergeAudioRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MergeAudioRoleC83AD2DD"
+          }
+        ],
+        "/VideoDubbingStack/MergeAudioRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MergeAudioRoleDefaultPolicyD1089650"
+          }
+        ],
+        "/VideoDubbingStack/SqsGetDeleteMessagePolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SqsGetDeleteMessagePolicy2BA1BDAF"
+          }
+        ],
+        "/VideoDubbingStack/DynamoGetItemPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoGetItemPolicy5E689006"
+          }
+        ],
+        "/VideoDubbingStack/DynamoQueryIndexPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoQueryIndexPolicyF3BB1650"
+          }
+        ],
+        "/VideoDubbingStack/SnsEmailNotificationPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SnsEmailNotificationPolicy19E6B7CF"
+          }
+        ],
+        "/VideoDubbingStack/S3GetSourceAssetPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "S3GetSourceAssetPolicy27340AB4"
+          }
+        ],
         "/VideoDubbingStack/MergeAudioLambda/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "MergeAudioLambda236640A9"
+          }
+        ],
+        "/VideoDubbingStack/MergeAudioLambda/SqsEventSource:VideoDubbingStackMergeAudio17D95257/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MergeAudioLambdaSqsEventSourceVideoDubbingStackMergeAudio17D9525762FF5914"
           }
         ],
         "/VideoDubbingStack/CDKMetadata/Default": [
