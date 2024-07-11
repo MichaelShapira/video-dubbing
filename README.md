@@ -16,6 +16,6 @@ You need to install AWS CDK following this instructions https://docs.aws.amazon.
 ```
 cdk deploy CallCenterPyStack -f  --parameters snstopicemailparam=YOUR_EMAIL@dummy.com
 ```
-Note the "snstopicemailparam" parameter. This is the email address that you will get the JSON that is described above.
+Note the "snstopicemailparam" parameter. This is the email address that you will get link with translated asset. The link is valid for 24 hours only.
  
-Also note that before actually getting the JSON by email, you will get another email that asks you to verify your email.
+Also note that before actually getting the email with the link, you will get another email that asks you to verify your email.
