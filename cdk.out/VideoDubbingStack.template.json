@@ -1030,6 +1030,19 @@
          "Arn"
         ]
        }
+      },
+      {
+       "Action": [
+        "sqs:GetQueueUrl",
+        "sqs:SendMessage"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "MergeAudio2D8ED7DE",
+         "Arn"
+        ]
+       }
       }
      ],
      "Version": "2012-10-17"
@@ -1038,6 +1051,9 @@
     "Roles": [
      {
       "Ref": "ConvertSubtitlesToPollyLambdaRole885734CA"
+     },
+     {
+      "Ref": "PolyJobCompletedRole832B969F"
      }
     ]
    },
@@ -1106,7 +1122,7 @@
     "aws:cdk:path": "VideoDubbingStack/DynamoPutItemPolicy/Resource"
    }
   },
-  "SnsPollyJobNotificationPolictE8C69547": {
+  "SnsPollyJobNotificationPolicy6CFF3A00": {
    "Type": "AWS::IAM::Policy",
    "Properties": {
     "PolicyDocument": {
@@ -1121,7 +1137,7 @@
      ],
      "Version": "2012-10-17"
     },
-    "PolicyName": "SnsPollyJobNotificationPolictE8C69547",
+    "PolicyName": "SnsPollyJobNotificationPolicy6CFF3A00",
     "Roles": [
      {
       "Ref": "ConvertSubtitlesToPollyLambdaRole885734CA"
@@ -1129,7 +1145,7 @@
     ]
    },
    "Metadata": {
-    "aws:cdk:path": "VideoDubbingStack/SnsPollyJobNotificationPolict/Resource"
+    "aws:cdk:path": "VideoDubbingStack/SnsPollyJobNotificationPolicy/Resource"
    }
   },
   "VideoDubbingConvertSubsToPollyCA61E95F": {
@@ -1139,7 +1155,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "ed7a7cd9e5424f8fbd9de63c49ee42ea72998eee6a48d4e09c369a258dadc01c.zip"
+     "S3Key": "d2ba87f6cb07d612920b2ab67c6ff83b43a539b2dd915d37b4f8ad8b9293df18.zip"
     },
     "Environment": {
      "Variables": {
@@ -1176,7 +1192,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly/Resource",
-    "aws:asset:path": "asset.ed7a7cd9e5424f8fbd9de63c49ee42ea72998eee6a48d4e09c369a258dadc01c",
+    "aws:asset:path": "asset.d2ba87f6cb07d612920b2ab67c6ff83b43a539b2dd915d37b4f8ad8b9293df18",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1198,15 +1214,320 @@
     "aws:cdk:path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly/SqsEventSource:VideoDubbingStackSrtToPollyF5A9260D/Resource"
    }
   },
+  "MergeAudio2D8ED7DE": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "ReceiveMessageWaitTimeSeconds": 20,
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "VideoDubbingDLQFF6409FE",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 5
+    },
+    "VisibilityTimeout": 120
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/MergeAudio/Resource"
+   }
+  },
+  "PolyJobCompletedRole832B969F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/PolyJobCompletedRole/Resource"
+   }
+  },
+  "DynamoPutGetItemPolicyFC7FE052": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "VideoDubbungPollyJobStatus67E8C401",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "VideoDubbungStatusBC5B51B6",
+          "Arn"
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "DynamoPutGetItemPolicyFC7FE052",
+    "Roles": [
+     {
+      "Ref": "PolyJobCompletedRole832B969F"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/DynamoPutGetItemPolicy/Resource"
+   }
+  },
+  "SnsPollyJobCompletedNotificationPolicyD63A5C67": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "sns:GetTopicAttributes",
+        "sns:Receive"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "VideoDubbingPollyJobsD6E6C2C7"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "SnsPollyJobCompletedNotificationPolicyD63A5C67",
+    "Roles": [
+     {
+      "Ref": "PolyJobCompletedRole832B969F"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/SnsPollyJobCompletedNotificationPolicy/Resource"
+   }
+  },
+  "PolyJobCompletedLambdaAEBB5A1E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "d2ba87f6cb07d612920b2ab67c6ff83b43a539b2dd915d37b4f8ad8b9293df18.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "DYNAMO_DUBBING_STATUS_TABLE": {
+       "Ref": "VideoDubbungStatusBC5B51B6"
+      },
+      "DYNAMO_POLLY_JOBS_TABLE": {
+       "Ref": "VideoDubbungPollyJobStatus67E8C401"
+      },
+      "SQS_MERGE_AUDIO": {
+       "Fn::GetAtt": [
+        "MergeAudio2D8ED7DE",
+        "QueueName"
+       ]
+      }
+     }
+    },
+    "Handler": "process-polly-task-result.lambda_handler",
+    "MemorySize": 128,
+    "Role": {
+     "Fn::GetAtt": [
+      "PolyJobCompletedRole832B969F",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 60
+   },
+   "DependsOn": [
+    "PolyJobCompletedRole832B969F"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/PolyJobCompletedLambda/Resource",
+    "aws:asset:path": "asset.d2ba87f6cb07d612920b2ab67c6ff83b43a539b2dd915d37b4f8ad8b9293df18",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "PolyJobCompletedLambdaAllowInvokeVideoDubbingStackVideoDubbingPollyJobs00FD9F22B63F995C": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "PolyJobCompletedLambdaAEBB5A1E",
+      "Arn"
+     ]
+    },
+    "Principal": "sns.amazonaws.com",
+    "SourceArn": {
+     "Ref": "VideoDubbingPollyJobsD6E6C2C7"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/PolyJobCompletedLambda/AllowInvoke:VideoDubbingStackVideoDubbingPollyJobs00FD9F22"
+   }
+  },
+  "PolyJobCompletedLambdaVideoDubbingPollyJobs6634B343": {
+   "Type": "AWS::SNS::Subscription",
+   "Properties": {
+    "Endpoint": {
+     "Fn::GetAtt": [
+      "PolyJobCompletedLambdaAEBB5A1E",
+      "Arn"
+     ]
+    },
+    "Protocol": "lambda",
+    "TopicArn": {
+     "Ref": "VideoDubbingPollyJobsD6E6C2C7"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/PolyJobCompletedLambda/VideoDubbingPollyJobs/Resource"
+   }
+  },
+  "VideoDubbingEmail8BE6995A": {
+   "Type": "AWS::SNS::Topic",
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/VideoDubbingEmail/Resource"
+   }
+  },
+  "VideoDubbingEmailTokenSubscription1B1D38C2D": {
+   "Type": "AWS::SNS::Subscription",
+   "Properties": {
+    "Endpoint": {
+     "Ref": "snstopicemailparam"
+    },
+    "Protocol": "email",
+    "TopicArn": {
+     "Ref": "VideoDubbingEmail8BE6995A"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/VideoDubbingEmail/TokenSubscription:1/Resource"
+   }
+  },
+  "FFmpegLayer65FCD2A8": {
+   "Type": "AWS::Lambda::LayerVersion",
+   "Properties": {
+    "CompatibleRuntimes": [
+     "python3.11"
+    ],
+    "Content": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "e9d3ac6e04486a38d3bc9c11c8c1496d20d63a0379e6de211698f41b6deffe30.zip"
+    },
+    "Description": "FFmpeg binary layer"
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/FFmpegLayer/Resource",
+    "aws:asset:path": "asset.e9d3ac6e04486a38d3bc9c11c8c1496d20d63a0379e6de211698f41b6deffe30",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Content"
+   }
+  },
+  "MergeAudioLambda236640A9": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "8d23ac70620f8e4dfde34886040e57b6ba3043d09a2aec13a1945bf60320e64e.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "DYNAMO_DUBBING_STATUS_TABLE": {
+       "Ref": "VideoDubbungStatusBC5B51B6"
+      },
+      "DYNAMO_POLLY_JOBS_TABLE": {
+       "Ref": "VideoDubbungPollyJobStatus67E8C401"
+      },
+      "DYNAMO_POLLY_JOBS_INDEX": "dubbing_job_id_index",
+      "SNS_EMAIL_TOPIC": {
+       "Ref": "VideoDubbingEmail8BE6995A"
+      },
+      "FFMPEG_PATH": "/var/task/bin/ffmpeg"
+     }
+    },
+    "Handler": "merge-audio.lambda_handler",
+    "MemorySize": 128,
+    "Role": {
+     "Fn::GetAtt": [
+      "PolyJobCompletedRole832B969F",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 60
+   },
+   "DependsOn": [
+    "PolyJobCompletedRole832B969F"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/MergeAudioLambda/Resource",
+    "aws:asset:path": "asset.8d23ac70620f8e4dfde34886040e57b6ba3043d09a2aec13a1945bf60320e64e",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/2WQ3U7DMAyFn2X3WWDtE7AJuEIq3cTtlCZmmOan1MlQVeXdSdJpDHF1jj87kY8rvqlrfr8S37SWql9r7Pi890L2LKHjjMLwuXUa2O7dFm2cRjnlcnGRaWE6Jfj8FKz06Gzu3foGRoNEuXo8g/V7F0YJL2IY0J7ywH8aGdVHQQSe+EOWVPN5G2QPfisI2GLz44tb5He52zoyNVlhnErZDqLT8FblkWftOqELiAzyDpSyhkvWkCl9JfQaIBRWTII2wYMbUGZYTIysBSoJWNk3nfBU0gXyzlx7+eOr/9NqRndGBWNJl8Z2zirMF4ysmfyHs3c131S8Wn0S4noM1qMB3i76A7F9Fz/GAQAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/22QTU7DMBCFz9K9a2hyAloBG5BCW3VbTZyhNfFP8NhFUZS7YzulBInVvPeN7fG8gq/Kkt8v4IuWommXStZ82HkQLYvoOEjQfNhahWzzbnKtrJKiT3ZSI1Og6wb48BSM8NKa1JvrCp2WRMk9XtD4nQ1O4Ct0nTSndOAf+gI9ugM6ur4x9yOj8ghE6Ik/pBI9H9ZBtOjXQMgmma5d1VR+fz73I2t6A9o2cfE91AoPRTryrGwNKoORYfogxSDCNYiQKH1G9BYwZJZFhCbCve2kSHASu1CTcLL7CWTux5FtkfLuLC8Twz/lXAJ5q2+9NPWm/7QqZy+yQZdXT3GDA40eXTIbaxqZ57Cq92dr7kq+Knix+CAply4YLzXy7VS/AaYcRywNAgAA"
    },
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/CDKMetadata/Default"
    },
    "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Parameters": {
+  "snstopicemailparam": {
+   "Type": "String"
+  },
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
   }
  },
  "Conditions": {
@@ -1417,13 +1738,6 @@
      ]
     }
    ]
-  }
- },
- "Parameters": {
-  "BootstrapVersion": {
-   "Type": "AWS::SSM::Parameter::Value<String>",
-   "Default": "/cdk-bootstrap/hnb659fds/version",
-   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
   }
  },
  "Rules": {

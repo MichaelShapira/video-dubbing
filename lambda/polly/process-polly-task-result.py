@@ -1,4 +1,5 @@
 import boto3
+import os
 import json
 from botocore.exceptions import ClientError
 
@@ -149,10 +150,10 @@ def lambda_handler(event, context):
      polly_output_object = message['outputUri']
 
      dubbing_job_id = update_polly_job_status(task_id,task_status,polly_output_object)
-     if media_id:
-        print(f"Updated successfully. Media ID: {media_id}")
+     if dubbing_job_id:
+        print(f"Updated successfully. Dubbing Job ID: {dubbing_job_id}")
      else:
-        print("Failed to update or retrieve Media ID")    
+        print("Failed to update or retrieve Dubbing Job ID")    
 
 
      partition_key = 'dubbing_job_id'

@@ -18,13 +18,16 @@ from aws_cdk import (
 )
 from constructs import Construct
 import uuid
+import subprocess
 import aws_cdk as cdk
 from aws_cdk.aws_iam import PolicyStatement
+
 class VideoDubbingStack(Stack):
 
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-
+        
+        
         
         transcribeLambdaRole = iam.Role(self, "TranscribeForDubbingLambdaRole",
                      assumed_by=iam.ServicePrincipal("lambda.amazonaws.com")
@@ -87,8 +90,10 @@ class VideoDubbingStack(Stack):
               removal_policy= RemovalPolicy.DESTROY,
               
         )
+        dynamo_polly_job_index_name = 'dubbing_job_id_index'
+
         table_polly_job.add_global_secondary_index(
-            index_name= 'dubbing_job_id_index',
+            index_name= dynamo_polly_job_index_name,
             partition_key= dynamo.Attribute(name="dubbing_job_id", type=dynamo.AttributeType.STRING)
         )
         
@@ -214,7 +219,7 @@ class VideoDubbingStack(Stack):
         convertSubtitlesToPollyLambdaRole.attach_inline_policy(dynamoPutItemPolicy)
 
 
-        snsPollyJobNotificationPolict = iam.Policy(self, "SnsPollyJobNotificationPolict") 
+        snsPollyJobNotificationPolict = iam.Policy(self, "SnsPollyJobNotificationPolicy") 
         snsPollyJobNotificationPolict.add_statements(PolicyStatement(
                     effect=iam.Effect.ALLOW,
                     actions=["sns:Publish"],
@@ -247,3 +252,87 @@ class VideoDubbingStack(Stack):
 
         #Add SQS event source to the Lambda function
         convertSubtitlesToPollyLambda.add_event_source(sqs_event_source)                              
+  
+        queueMergeAudio = sqs.Queue(self, "MergeAudio",
+                visibility_timeout=Duration.seconds(120),
+                receive_message_wait_time=Duration.seconds(20),
+                dead_letter_queue=sqs.DeadLetterQueue(
+                max_receive_count=5,  # Number of retries before sending the message to the DLQ
+                queue=dlq
+            )
+            )
+
+        polyJobCompletedRole = iam.Role(self, "PolyJobCompletedRole",
+                     assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"))
+        polyJobCompletedRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
+
+        dynamoPutGetItemPolicy = iam.Policy(self, "DynamoPutGetItemPolicy") 
+        dynamoPutGetItemPolicy.add_statements(PolicyStatement(
+                    effect=iam.Effect.ALLOW,
+                    actions=["dynamodb:PutItem","dynamodb:GetItem","dynamodb:UpdateItem"],
+                    resources=[table.table_arn,table_polly_job.table_arn]
+                )) 
+        polyJobCompletedRole.attach_inline_policy(dynamoPutGetItemPolicy)
+
+        snsPollyJobNotificationPolicy = iam.Policy(self, "SnsPollyJobCompletedNotificationPolicy") 
+        snsPollyJobNotificationPolicy.add_statements(PolicyStatement(
+                    effect=iam.Effect.ALLOW,
+                    actions=["sns:Receive","sns:GetTopicAttributes"],
+                    resources=[sns_topic.topic_arn]
+                )) 
+
+        polyJobCompletedRole.attach_inline_policy(snsPollyJobNotificationPolicy)   
+
+        sqsSendMessagePolicy = iam.Policy(self, "SqsSendMessagePolicy")  
+        sqsPutMessagePolicy.add_statements(PolicyStatement(
+                    effect=iam.Effect.ALLOW,
+                    actions=["sqs:SendMessage","sqs:GetQueueUrl"],
+                    resources=[queueMergeAudio.queue_arn]
+                ))  
+
+        polyJobCompletedRole.attach_inline_policy(sqsPutMessagePolicy)              
+
+        # Lambda that is called when Amazon Polly job completed
+        polyJobCompletedLambda = _lambda.Function(self, "PolyJobCompletedLambda",
+                                    runtime=_lambda.Runtime.PYTHON_3_11,
+                                    handler="process-polly-task-result.lambda_handler",
+                                    code=_lambda.Code.from_asset("./lambda/polly"),
+                                    timeout=cdk.Duration.seconds(60),
+                                    memory_size=128,
+                                    role = polyJobCompletedRole,
+                                    environment={  
+                                                "DYNAMO_DUBBING_STATUS_TABLE": table.table_name,
+                                                "DYNAMO_POLLY_JOBS_TABLE": table_polly_job.table_name,
+                                                "SQS_MERGE_AUDIO": queueMergeAudio.queue_name
+                                            }
+                                    )
+
+        sns_topic.add_subscription(subscriptions.LambdaSubscription(polyJobCompletedLambda) )     
+
+        sns_email_topic = sns.Topic(self, "VideoDubbingEmail")    
+        email_address = CfnParameter(self, "sns-topic-email-param")
+
+        sns_email_topic.add_subscription(subscriptions.EmailSubscription(email_address.value_as_string))    
+
+        ffmpeg_layer = _lambda.LayerVersion(self, "FFmpegLayer",
+                    code=_lambda.Code.from_asset("./lambda/ffmpeg/bin"),
+                    compatible_runtimes=[_lambda.Runtime.PYTHON_3_11],
+                    description="FFmpeg binary layer"
+)
+        # Lambda that is called when Amazon Polly job completed
+        mergeAudioLambda = _lambda.Function(self, "MergeAudioLambda",
+                                    runtime=_lambda.Runtime.PYTHON_3_11,
+                                    handler="merge-audio.lambda_handler",
+                                    code=_lambda.Code.from_asset("./lambda/ffmpeg"),
+                                    timeout=cdk.Duration.seconds(60),
+                                    memory_size=128,
+                                    role = polyJobCompletedRole,
+                                    environment={  
+                                                "DYNAMO_DUBBING_STATUS_TABLE": table.table_name,
+                                                "DYNAMO_POLLY_JOBS_TABLE": table_polly_job.table_name,
+                                                "DYNAMO_POLLY_JOBS_INDEX": dynamo_polly_job_index_name,
+                                                "SNS_EMAIL_TOPIC": sns_email_topic.topic_arn,
+                                                "FFMPEG_PATH": '/var/task/bin/ffmpeg'
+                                            }
+                                    ) 
+        layers=[ffmpeg_layer]                                                               

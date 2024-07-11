@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/0ac854d0148ba8b117efe4947cddd18e11e02db157622bd396b87982deccbdeb.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/53891ac9dddba3bdd4c4525b10f4bee347dac998a3a325c5d181989ef7c4fba1.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -244,10 +244,10 @@
             "data": "DynamoPutItemPolicy16302363"
           }
         ],
-        "/VideoDubbingStack/SnsPollyJobNotificationPolict/Resource": [
+        "/VideoDubbingStack/SnsPollyJobNotificationPolicy/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "SnsPollyJobNotificationPolictE8C69547"
+            "data": "SnsPollyJobNotificationPolicy6CFF3A00"
           }
         ],
         "/VideoDubbingStack/VideoDubbingConvertSubsToPolly/Resource": [
@@ -260,6 +260,84 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "VideoDubbingConvertSubsToPollySqsEventSourceVideoDubbingStackSrtToPollyF5A9260DE0086275"
+          }
+        ],
+        "/VideoDubbingStack/MergeAudio/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MergeAudio2D8ED7DE"
+          }
+        ],
+        "/VideoDubbingStack/PolyJobCompletedRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PolyJobCompletedRole832B969F"
+          }
+        ],
+        "/VideoDubbingStack/DynamoPutGetItemPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DynamoPutGetItemPolicyFC7FE052"
+          }
+        ],
+        "/VideoDubbingStack/SnsPollyJobCompletedNotificationPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SnsPollyJobCompletedNotificationPolicyD63A5C67"
+          }
+        ],
+        "/VideoDubbingStack/SqsSendMessagePolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SqsSendMessagePolicy702314CC"
+          }
+        ],
+        "/VideoDubbingStack/PolyJobCompletedLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PolyJobCompletedLambdaAEBB5A1E"
+          }
+        ],
+        "/VideoDubbingStack/PolyJobCompletedLambda/AllowInvoke:VideoDubbingStackVideoDubbingPollyJobs00FD9F22": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PolyJobCompletedLambdaAllowInvokeVideoDubbingStackVideoDubbingPollyJobs00FD9F22B63F995C"
+          }
+        ],
+        "/VideoDubbingStack/PolyJobCompletedLambda/VideoDubbingPollyJobs/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PolyJobCompletedLambdaVideoDubbingPollyJobs6634B343"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingEmail/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingEmail8BE6995A"
+          }
+        ],
+        "/VideoDubbingStack/VideoDubbingEmail/TokenSubscription:1/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VideoDubbingEmailTokenSubscription1B1D38C2D"
+          }
+        ],
+        "/VideoDubbingStack/sns-topic-email-param": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "snstopicemailparam"
+          }
+        ],
+        "/VideoDubbingStack/FFmpegLayer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FFmpegLayer65FCD2A8"
+          }
+        ],
+        "/VideoDubbingStack/MergeAudioLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MergeAudioLambda236640A9"
           }
         ],
         "/VideoDubbingStack/CDKMetadata/Default": [
