@@ -254,7 +254,7 @@ class VideoDubbingStack(Stack):
         convertSubtitlesToPollyLambda.add_event_source(sqs_event_source)                              
   
         queueMergeAudio = sqs.Queue(self, "MergeAudio",
-                visibility_timeout=Duration.seconds(120),
+                visibility_timeout=Duration.seconds(950),
                 receive_message_wait_time=Duration.seconds(20),
                 dead_letter_queue=sqs.DeadLetterQueue(
                 max_receive_count=5,  # Number of retries before sending the message to the DLQ
@@ -384,7 +384,8 @@ class VideoDubbingStack(Stack):
                                                 "DYNAMO_POLLY_JOBS_TABLE": table_polly_job.table_name,
                                                 "DYNAMO_POLLY_JOBS_INDEX": dynamo_polly_job_index_name,
                                                 "SNS_EMAIL_TOPIC": sns_email_topic.topic_arn,
-                                                "FFMPEG_PATH": '/var/task/bin/ffmpeg'
+                                                "FFMPEG_PATH": '/var/task/bin/ffmpeg',
+                                                "EMAIL_ADDRESS": email_address.value_as_string
                                             },
                                      layers=[ffmpeg_layer]          
                                     ) 
@@ -394,4 +395,8 @@ class VideoDubbingStack(Stack):
         sqs_event_source = lambda_event_source.SqsEventSource(queueMergeAudio)
 
         #Add SQS event source to the Lambda function
-        mergeAudioLambda.add_event_source(sqs_event_source)                                                               
+        mergeAudioLambda.add_event_source(sqs_event_source)   
+
+        CfnOutput(self, "Upload Audio File To This S3 bucket", value=sourceBucket.bucket_name)
+        CfnOutput(self, "Staging files located here", value=stagingBucket.bucket_name)
+                                                                   
