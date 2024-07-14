@@ -48,12 +48,24 @@ By default, the dubbing is done from English to Russian.
 You can control the language setup in the following way:
 1. Change the configuration of the Lambda that starts the transcription job. (Set the language of original video asset) 
    <img width="939" alt="image" src="https://github.com/user-attachments/assets/c7b3a673-3dfa-42ed-bbc7-cb7a407e94ae">
-   The name of the Lambda appears in the output of the deployment process.
+
+The name of the Lambda appears in the output of the deployment process.
+  
    <img width="854" alt="image" src="https://github.com/user-attachments/assets/5f25bf6c-9fa5-4fbb-a901-dd243e9f2b53">
 
    Supported Languages: https://docs.aws.amazon.com/transcribe/latest/dg/supported-languages.html
 
-2. 
+2. Change the configuration of Lambda that converts text-to-speech by using Amazon Polly
+
+   <img width="824" alt="image" src="https://github.com/user-attachments/assets/81819e1d-d79c-4503-a5a5-ba2f11b61c96">
+
+The name of the Lambda appears in the output of the deployment process.
+
+<img width="1140" alt="image" src="https://github.com/user-attachments/assets/ba86fc1c-f917-482e-a21e-337f45a1b2e2">
+
+   Supported languages and voices: https://docs.aws.amazon.com/polly/latest/dg/supported-languages.html
+
+
    
 
 
