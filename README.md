@@ -2,7 +2,7 @@
 # Video Dubbing Pipeline with AWS AIML Services
 
 Creating video dubbing is a time-consuming and expensive operation. We can automate it with an AI-ML service. Specifically with speech-to-text and text-to-speech. The following project provides the pipeline that starts with uploading the video asset and ends with the user getting an email with a link to the translated asset.
-The solution is tightly decoupled and very flexible due to the extensive usage of queues and notifications. Note that this project should be treated as POC only and in no way production ready.
+The solution is tightly decoupled and very flexible due to the extensive usage of queues and notifications.
 
 ## Declamer
 
