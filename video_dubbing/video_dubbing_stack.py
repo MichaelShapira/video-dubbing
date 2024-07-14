@@ -399,4 +399,6 @@ class VideoDubbingStack(Stack):
 
         CfnOutput(self, "Upload Audio File To This S3 bucket", value=sourceBucket.bucket_name)
         CfnOutput(self, "Staging files located here", value=stagingBucket.bucket_name)
+        CfnOutput(self, "Start Transcribe Job Lambda", value=functionAudionToText.function_name)
+        CfnOutput(self, "Polly Job Lambda", value=convertSubtitlesToPollyLambda.function_name)
                                                                    
