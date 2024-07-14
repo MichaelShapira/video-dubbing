@@ -17,6 +17,9 @@ This project is done for educational purposes. It can be used as a POC, but you 
 3. When the transcription job ends, Amazon Transcribe sends the job-completed event to Amazon EvenBrigde.
 4. Amazon Lambda is invoked by Amazoin Event-Bridge to convert the unstructured data from transcription data into JSON format.
 5. The data is being placed into the Amazon Simple Queue Service (SQS) for further processing.
+6. Another Lambda picks the message from the queue, stores metadata about the dubbing job in DynamoDB, and starts multiple text-to-speech jobs with Amazon Polly.
+7. Each Polly job reports the completion of the job to the Amazon Simple Notification Service (SNS).
+8. Amazon Lambda, which is subscribed to SNS, identifies that all polly jobs have been completed and updates the metadata in DynamoDB.
 
 ## Prerequisites
 
