@@ -9,14 +9,15 @@ The solution is tightly decoupled and very flexible due to the extensive usage o
 This project is done for educational purposes. It can be used as a POC, but you should not consider it as production ready deployment.
 
 ## Architecture
-<img width="1112" alt="image" src="https://github.com/MichaelShapira/video-dubbing/assets/135519473/14853229-38aa-4911-912b-ef3559b40694">
+![image](https://github.com/user-attachments/assets/559a711f-3bbe-436f-a185-bec45c7174e7)
+
 
 ## Architecture Explained
 
 1. Upload your video asset to S3.
 2. S3 Event invokes Lambda, which starts the transcription job.
 3. When the transcription job ends, Amazon Transcribe sends the job-completed event to Amazon EvenBrigde.
-4. Amazon Lambda is invoked by Amazoin Event-Bridge to convert the unstructured data from transcription data into JSON format.
+4. Amazon Lambda is invoked by Amazoin Event-Bridge to convert the unstructured data from transcription data into JSON format and translate the text with Amazon Translate service.
 5. The data is being placed into the Amazon Simple Queue Service (SQS) for further processing.
 6. Another Lambda picks the message from the queue, stores metadata about the dubbing job in DynamoDB, and starts multiple text-to-speech jobs with Amazon Polly.
 7. Each Polly job reports the completion of the job to the Amazon Simple Notification Service (SNS).
