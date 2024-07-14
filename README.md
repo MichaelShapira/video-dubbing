@@ -66,7 +66,10 @@ The name of the Lambda appears in the output of the deployment process
 
    ![image](https://github.com/user-attachments/assets/9c47625c-f66f-43e6-a562-535431710fc5)
 
-4. Change the configuration of Lambda that converts text-to-speech by using Amazon Polly
+Supported languages for Amazon Translate: https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
+   
+
+3. Change the configuration of Lambda that converts text-to-speech by using Amazon Polly
 
    <img width="824" alt="image" src="https://github.com/user-attachments/assets/81819e1d-d79c-4503-a5a5-ba2f11b61c96">
 
