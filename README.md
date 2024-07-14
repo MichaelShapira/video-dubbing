@@ -14,6 +14,9 @@ This project is done for educational purposes. It can be used as a POC, but you 
 
 1. Upload your video asset to S3.
 2. S3 Event invokes Lambda, which starts the transcription job.
+3. When the transcription job ends, Amazon Transcribe sends the job-completed event to Amazon EvenBrigde.
+4. Amazon Lambda is invoked by Amazoin Event-Bridge to convert the unstructured data from transcription data into JSON format.
+5. The data is being placed into the Amazon Simple Queue Service (SQS) for further processing.
 
 ## Prerequisites
 
