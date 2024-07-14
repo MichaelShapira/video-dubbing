@@ -42,6 +42,24 @@ Also note that before actually getting the email with the link, you will get ano
 All you have to do is upload your video file to the S3 bucket. The name of the bucket appears in the output of the deployment process.
 <img width="1022" alt="image" src="https://github.com/user-attachments/assets/6bacdd42-d325-4674-917d-e31db9838e9e">
 
+## Language Setup
+
+By default, the dubbing is done from English to Russian.
+You can control the language setup in the following way:
+1. Change the configuration of the Lambda that starts the transcription job. (Set the language of original video asset) 
+   <img width="939" alt="image" src="https://github.com/user-attachments/assets/c7b3a673-3dfa-42ed-bbc7-cb7a407e94ae">
+   The name of the Lambda appears in the output of the deployment process.
+   <img width="854" alt="image" src="https://github.com/user-attachments/assets/5f25bf6c-9fa5-4fbb-a901-dd243e9f2b53">
+
+   Supported Languages: https://docs.aws.amazon.com/transcribe/latest/dg/supported-languages.html
+
+2. 
+   
+
+
+   
+
+
 
 ## Current State of the project
 
