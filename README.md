@@ -10,6 +10,11 @@ This project is done for educational purposes. It can be used as a POC, but you 
 ## Architecture
 <img width="1112" alt="image" src="https://github.com/MichaelShapira/video-dubbing/assets/135519473/14853229-38aa-4911-912b-ef3559b40694">
 
+## Architecture Explained
+
+1. Upload your video asset to S3.
+2. S3 Event invokes Lambda, which starts the transcription job.
+
 ## Prerequisites
 
 You need to install AWS CDK following this instructions https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html.
@@ -21,6 +26,12 @@ cdk deploy --parameters snstopicemailparam=YOUR_EMAIL@dummy.com
 Note the "snstopicemailparam" parameter. This is the email address that you will get link with translated asset. The link is valid for 24 hours only.
  
 Also note that before actually getting the email with the link, you will get another email that asks you to verify your email.
+
+## Quick Start
+
+All you have to do is upload your video file to the S3 bucket. The name of the bucket appears in the output of the deployment process.
+<img width="1022" alt="image" src="https://github.com/user-attachments/assets/6bacdd42-d325-4674-917d-e31db9838e9e">
+
 
 ## Current State of the project
 
