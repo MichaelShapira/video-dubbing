@@ -20,6 +20,9 @@ This project is done for educational purposes. It can be used as a POC, but you 
 6. Another Lambda picks the message from the queue, stores metadata about the dubbing job in DynamoDB, and starts multiple text-to-speech jobs with Amazon Polly.
 7. Each Polly job reports the completion of the job to the Amazon Simple Notification Service (SNS).
 8. Amazon Lambda, which is subscribed to SNS, identifies that all polly jobs have been completed and updates the metadata in DynamoDB.
+9. Once all polly jobs are completed, the message is put into another SQS queue for further processing.
+10. Finally, all Polly job output files (MP3) are being merged into the original video asset by using the FFMPEG utility, and again, I used Amazon Lambda for this.
+11. As the last step, I created a presigned url from the merged output, and this url was sent to the recipient that the user defined as part of the cdk deployment command.
 
 ## Prerequisites
 
