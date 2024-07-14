@@ -56,7 +56,17 @@ The name of the Lambda appears in the output of the deployment process.
 
    Supported Languages: https://docs.aws.amazon.com/transcribe/latest/dg/supported-languages.html
 
-2. Change the configuration of Lambda that converts text-to-speech by using Amazon Polly
+2. Set the language to which to translate the transcription text. Transciption processing Lambda is responsible for setting the language of the text to translate.
+   You need to provide both the source and the target languages.
+
+   ![image](https://github.com/user-attachments/assets/441cdbb3-ed37-45e7-83fc-0e240543ca00)
+
+   
+The name of the Lambda appears in the output of the deployment process
+
+   ![image](https://github.com/user-attachments/assets/9c47625c-f66f-43e6-a562-535431710fc5)
+
+4. Change the configuration of Lambda that converts text-to-speech by using Amazon Polly
 
    <img width="824" alt="image" src="https://github.com/user-attachments/assets/81819e1d-d79c-4503-a5a5-ba2f11b61c96">
 
