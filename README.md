@@ -33,7 +33,7 @@ Target (Russian Translation): [JeffDay1Translated.mp4](https://github.com/Michae
 
 ## Prerequisites
 
-You need to install AWS CDK following this instructions https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html.
+You need to install AWS CDK following this [instructions](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html) .
 
 ## Deployment
 ```
@@ -59,7 +59,7 @@ The name of the Lambda appears in the output of the deployment process.
   
    <img width="854" alt="image" src="https://github.com/user-attachments/assets/5f25bf6c-9fa5-4fbb-a901-dd243e9f2b53">
 
-   Supported Languages: https://docs.aws.amazon.com/transcribe/latest/dg/supported-languages.html
+   Supported Languages: check [here](https://docs.aws.amazon.com/transcribe/latest/dg/supported-languages.html).
 
 2. Set the language to which to translate the transcription text. Transciption processing Lambda is responsible for setting the language of the text to translate.
    You need to provide both the source and the target languages.
@@ -71,7 +71,7 @@ The name of the Lambda appears in the output of the deployment process
 
    ![image](https://github.com/user-attachments/assets/9c47625c-f66f-43e6-a562-535431710fc5)
 
-Supported languages for Amazon Translate: https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
+Supported languages for Amazon Translate: check [here](https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html).
    
 
 3. Change the configuration of Lambda that converts text-to-speech by using Amazon Polly
@@ -82,7 +82,7 @@ The name of the Lambda appears in the output of the deployment process.
 
 <img width="1140" alt="image" src="https://github.com/user-attachments/assets/ba86fc1c-f917-482e-a21e-337f45a1b2e2">
 
-   Supported languages and voices: https://docs.aws.amazon.com/polly/latest/dg/supported-languages.html
+   Supported languages and voices: check [here](https://docs.aws.amazon.com/polly/latest/dg/supported-languages.html).
 
 
    
