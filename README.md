@@ -10,7 +10,7 @@ This project is done for educational purposes. It can be used as a POC, but you 
 
 ## Sample Files
 
-Source: JeffDay1.mp4
+Source: [JeffDay1.mp4](https://github.com/MichaelShapira/video-dubbing/blob/main/JeffDay1.mp4)
 Target (Russian Translation): JeffDay1Translated.mp4
 
 ## Architecture
