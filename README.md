@@ -8,6 +8,11 @@ The solution is tightly decoupled and very flexible due to the extensive usage o
 
 This project is done for educational purposes. It can be used as a POC, but you should not consider it as production ready deployment.
 
+## Sample Files
+
+Source: JeffDay1.mp4
+Target (Russian Translation): JeffDay1Translated.mp4
+
 ## Architecture
 ![image](https://github.com/user-attachments/assets/559a711f-3bbe-436f-a185-bec45c7174e7)
 
