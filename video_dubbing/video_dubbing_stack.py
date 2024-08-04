@@ -129,7 +129,7 @@ class VideoDubbingStack(Stack):
         translateTextPolicy = iam.Policy(self, "TranslateTextPolicy")  
         translateTextPolicy.add_statements(PolicyStatement(
             effect=iam.Effect.ALLOW,
-            actions=["translate:TranslateText"],
+            actions=["translate:TranslateText","translate:ListLanguages"],
             resources=["*"]
         )) 
         processTransactionResultLambdaRole.attach_inline_policy(translateTextPolicy)
