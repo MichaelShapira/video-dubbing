@@ -38,11 +38,13 @@ def get_speaker_label_in_time_range(json_data, start_time_ms, end_time_ms):
     segments = json_data['speaker_labels']['segments']
     
     for segment in segments:
+        
         segment_start_time_ms = convert_to_milliseconds(segment['start_time'])
         segment_end_time_ms = convert_to_milliseconds(segment['end_time'])
-
+        
         
         if start_time_ms>=segment_start_time_ms  and end_time_ms<=segment_end_time_ms :
+            
             return segment['speaker_label']
     
     return None    
@@ -68,7 +70,7 @@ def parse_srt(srt_content,metadata_json):
             "sequence": sequence,
             "duration": duration,
             "text": translate_text(text),
-            "speaker": get_speaker_label_in_time_range(metadata_json,start_ms,duration)
+            "speaker": get_speaker_label_in_time_range(metadata_json,start_ms,end_ms)
         }
         
         subtitles.append(subtitle)
@@ -180,6 +182,7 @@ def lambda_handler(event, context):
     
     subtitles = parse_srt(srt_content,new_json)
     num_of_speakers = new_json['speaker_labels']['speakers']
+
 
     send_to_sqs(subtitles, f"s3://{work_bucket}/{work_object}",uuid4,video_file,num_of_speakers)
     
