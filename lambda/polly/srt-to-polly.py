@@ -33,7 +33,25 @@ def insert_dubbing_polly_job(polly_job_id, dubbing_job_id,sequence,start_time):
         return False
 
 
+def run_two_polly_jobs(text,next_text, duration,next_duration,break_time,unique_id,target_bucket,target_bucket_key):
 
+    polly_text=f"<speak><prosody amazon:max-duration=\"{duration}ms\">{text}</prosody><break time=\"{break_time}ms\"/><prosody amazon:max-duration=\"{next_duration}ms\">{next_text}</prosody></speak>"
+    
+    
+    # Start the asynchronous Polly job
+    response = polly_client.start_speech_synthesis_task(
+        Engine='standard',
+        LanguageCode=os.environ.get('POLLY_LANGUAGE_CODE'),
+        OutputFormat='mp3',
+        OutputS3BucketName=target_bucket,
+        OutputS3KeyPrefix=target_bucket_key,
+        Text=polly_text,
+        TextType='ssml',
+        VoiceId=os.environ.get('POLLY_VOICE_ID'),
+        SnsTopicArn=os.environ.get('POLLY_JOBS_SNS_ARN')
+    )
+    return response['SynthesisTask']['TaskId']
+    
 def run_polly_job(text, duration,unique_id,target_bucket,target_bucket_key):
 
     polly_text=f"<speak><prosody amazon:max-duration=\"{duration}ms\">{text}</prosody></speak>"
@@ -90,6 +108,8 @@ def lambda_handler(event, context):
     # Get the first (and only) record
     record = event['Records'][0]
     
+
+    
     receipt_handle = record['receiptHandle']
 
     # Extract the message body
@@ -110,12 +130,46 @@ def lambda_handler(event, context):
         print(f"Record inserted successfully into Dubbing_status table with id {unique_id}")
     else:
         print("Failed to insert record into Dubbing_status table")
-
-    for srt in translated_srt['subs']:
-        polly_job_id=run_polly_job(srt['text'], srt['duration'],unique_id,media_output_bucket,media_output_prefix)
-        sequence = srt['sequence']
-        start_time=srt['start_time']
+    
+    skip_element=False
+    sequence = None
+    start_time = None
+    
+    for index in range(len(translated_srt['subs'])):
+        
+        skip_element=False
+    #for srt in translated_srt['subs']:
+        if index + 1 < len(translated_srt['subs']):
+            if  translated_srt['subs'][index]["speaker"] ==  translated_srt['subs'][index+1]["speaker"]:
+                pause_between_srt=int(translated_srt['subs'][index+1]["start_time"]) - int(translated_srt['subs'][index]["end_time"])
+                if  pause_between_srt<=1000:
+                    polly_job_id = run_two_polly_jobs(translated_srt['subs'][index]["text"],
+                                                   translated_srt['subs'][index+1]["text"],
+                                                   translated_srt['subs'][index]["duration"],
+                                                   translated_srt['subs'][index+1]["duration"],
+                                                   pause_between_srt,
+                                                   unique_id,
+                                                   media_output_bucket,
+                                                   media_output_prefix)
+                    skip_element = True 
+                    sequence = translated_srt['subs'][index]["sequence"]
+                    start_time = translated_srt['subs'][index]["start_time"]
+                    
+        if skip_element:
+            index+=1
+            
+        else:    
+            polly_job_id=run_polly_job(translated_srt['subs'][index]["text"], 
+                                       translated_srt['subs'][index]["duration"],
+                                       unique_id,
+                                       media_output_bucket,
+                                       media_output_prefix)
+                                       
+            sequence = translated_srt['subs'][index]["sequence"]
+            start_time = translated_srt['subs'][index]["start_time"]
+            
         success = insert_dubbing_polly_job(polly_job_id, unique_id,sequence,start_time)
+        
         if success:
             print(f"Record inserted successfully into Dubbing_polly_jobs table with polly_job_id {polly_job_id}")
         else:
