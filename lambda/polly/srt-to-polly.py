@@ -33,7 +33,7 @@ def insert_dubbing_polly_job(polly_job_id, dubbing_job_id,sequence,start_time):
         return False
 
 
-def run_two_polly_jobs(text,next_text, duration,next_duration,break_time,unique_id,target_bucket,target_bucket_key):
+def run_two_polly_jobs(text,next_text, duration,next_duration,break_time,unique_id,target_bucket,target_bucket_key,voice):
 
     polly_text=f"<speak><prosody amazon:max-duration=\"{duration}ms\">{text}</prosody><break time=\"{break_time}ms\"/><prosody amazon:max-duration=\"{next_duration}ms\">{next_text}</prosody></speak>"
     
@@ -47,12 +47,12 @@ def run_two_polly_jobs(text,next_text, duration,next_duration,break_time,unique_
         OutputS3KeyPrefix=target_bucket_key,
         Text=polly_text,
         TextType='ssml',
-        VoiceId=os.environ.get('POLLY_VOICE_ID'),
+        VoiceId=voice,
         SnsTopicArn=os.environ.get('POLLY_JOBS_SNS_ARN')
     )
     return response['SynthesisTask']['TaskId']
     
-def run_polly_job(text, duration,unique_id,target_bucket,target_bucket_key):
+def run_polly_job(text, duration,unique_id,target_bucket,target_bucket_key,voice):
 
     polly_text=f"<speak><prosody amazon:max-duration=\"{duration}ms\">{text}</prosody></speak>"
     
@@ -66,7 +66,7 @@ def run_polly_job(text, duration,unique_id,target_bucket,target_bucket_key):
         OutputS3KeyPrefix=target_bucket_key,
         Text=polly_text,
         TextType='ssml',
-        VoiceId=os.environ.get('POLLY_VOICE_ID'),
+        VoiceId=voice,
         SnsTopicArn=os.environ.get('POLLY_JOBS_SNS_ARN')
     )
     return response['SynthesisTask']['TaskId']
@@ -150,7 +150,8 @@ def lambda_handler(event, context):
                                                    pause_between_srt,
                                                    unique_id,
                                                    media_output_bucket,
-                                                   media_output_prefix)
+                                                   media_output_prefix,
+                                                   translated_srt['subs'][index]["voice_id"])
                     skip_element = True 
                     sequence = translated_srt['subs'][index]["sequence"]
                     start_time = translated_srt['subs'][index]["start_time"]
@@ -163,7 +164,8 @@ def lambda_handler(event, context):
                                        translated_srt['subs'][index]["duration"],
                                        unique_id,
                                        media_output_bucket,
-                                       media_output_prefix)
+                                       media_output_prefix,
+                                       translated_srt['subs'][index]["voice_id"])
                                        
             sequence = translated_srt['subs'][index]["sequence"]
             start_time = translated_srt['subs'][index]["start_time"]
