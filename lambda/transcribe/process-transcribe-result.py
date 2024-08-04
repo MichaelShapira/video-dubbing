@@ -59,11 +59,12 @@ def parse_srt(srt_content,metadata_json):
         text = match[3].replace('\n', ' ').replace('"', '\\"')
 
         start_ms = srt_time_to_ms(start_time)
+        end_ms = srt_time_to_ms(end_time)
         duration = calculate_duration(start_time, end_time)
         
         subtitle = {
             "start_time": start_ms,
-            "end_time": end_time,
+            "end_time": end_ms,
             "sequence": sequence,
             "duration": duration,
             "text": translate_text(text),
