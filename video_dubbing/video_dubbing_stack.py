@@ -250,7 +250,6 @@ class VideoDubbingStack(Stack):
                                                 "DYNAMO_POLLY_JOBS_TABLE": table_polly_job.table_name,
                                                 "STAGING_BUCKET_NAME": stagingBucket.bucket_name,
                                                 "POLLY_LANGUAGE_CODE": "ru-RU",
-                                                "POLLY_VOICE_ID": "Tatyana",
                                                 "POLLY_JOBS_SNS_ARN":sns_topic.topic_arn
                                             },
                                     )
