@@ -134,6 +134,15 @@ class VideoDubbingStack(Stack):
         )) 
         processTransactionResultLambdaRole.attach_inline_policy(translateTextPolicy)
 
+
+        describeVoicesPolicy = iam.Policy(self, "DescribeVoicesPolicy")  
+        describeVoicesPolicy.add_statements(PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["polly:DescribeVoices"],
+            resources=["*"]
+        )) 
+        processTransactionResultLambdaRole.attach_inline_policy(describeVoicesPolicy)
+
         
         #End Permissions for processTransactionResultLambda
 
