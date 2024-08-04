@@ -11,6 +11,7 @@ transcribe_client = boto3.client("transcribe")
 s3_client = boto3.client('s3')
 sqs = boto3.client('sqs')
 translate = boto3.client('translate')
+polly = boto3.client('polly')
 
 def translate_text(text):
     
@@ -49,7 +50,7 @@ def get_speaker_label_in_time_range(json_data, start_time_ms, end_time_ms):
     
     return None    
     
-def parse_srt(srt_content,metadata_json):
+def parse_srt(srt_content,metadata_json,num_of_speakers,polly_voices):
     srt_pattern = re.compile(r'(\d+)\n(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})\n(.*?)(?=\n\d+\n|\Z)', re.DOTALL)
     matches = srt_pattern.findall(srt_content)
     
@@ -64,13 +65,30 @@ def parse_srt(srt_content,metadata_json):
         end_ms = srt_time_to_ms(end_time)
         duration = calculate_duration(start_time, end_time)
         
+        speaker_id =get_speaker_label_in_time_range(metadata_json,start_ms,end_ms)\
+        
+        if speaker_id==None:
+            speaker_id='spk_0'
+            
+
+        
+        speaker_id_index = int(speaker_id[-1])
+        
+        voice_id=None
+        
+        try:
+            voice_id = polly_voices[speaker_id_index]['Id']
+        except IndexError:
+            voice_id = polly_voices[0]['Id']
+        
         subtitle = {
             "start_time": start_ms,
             "end_time": end_ms,
             "sequence": sequence,
             "duration": duration,
             "text": translate_text(text),
-            "speaker": get_speaker_label_in_time_range(metadata_json,start_ms,end_ms)
+            "speaker": speaker_id,
+            "voice_id":voice_id
         }
         
         subtitles.append(subtitle)
@@ -139,6 +157,23 @@ def shrink_metadata_file(metadata_srt_content):
     new_json = {"speaker_labels": speaker_labels}
     return new_json
     
+def get_language_name(language_code):
+   
+    try:
+        # Call the list_languages API
+        response = translate.list_languages()
+
+        # Search for the matching language code
+        for language in response.get('Languages', []):
+            if language['LanguageCode'] == language_code:
+                return language['LanguageName']
+        
+        # If not found
+        return f"Language name for code '{language_code}' not found"
+
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
+    
 def lambda_handler(event, context):
 
     job_name = event['detail']['TranscriptionJobName']
@@ -150,8 +185,22 @@ def lambda_handler(event, context):
     mediaFile= job['TranscriptionJob']['Subtitles']['SubtitleFileUris'][0]
     metadata_data = job['TranscriptionJob']['Transcript']['TranscriptFileUri']
     
+    # we need it to find voices in AWS Polly
+    language_code = os.environ.get('AUDIO_LANGUAGE_TARGET')
+    language_name = get_language_name(language_code)
+    print(f"The language name for code '{language_code}' is: {language_name}")
     
     
+    response = polly.describe_voices(
+                Engine='standard'
+                )
+    print(response)
+    
+
+    # Extract elements where LanguageName is "Russian"
+    polly_voices = [voice for voice in response["Voices"] if voice["LanguageName"] == "Russian"]
+    
+
     #SRT file
     bucket,bucketKey =  parse_s3_url(mediaFile)
    
@@ -179,9 +228,9 @@ def lambda_handler(event, context):
     
     new_json = shrink_metadata_file(metadata_srt_content)
 
-    
-    subtitles = parse_srt(srt_content,new_json)
     num_of_speakers = new_json['speaker_labels']['speakers']
+    subtitles = parse_srt(srt_content,new_json,num_of_speakers,polly_voices)
+    
 
 
     send_to_sqs(subtitles, f"s3://{work_bucket}/{work_object}",uuid4,video_file,num_of_speakers)
