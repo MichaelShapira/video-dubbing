@@ -14,6 +14,7 @@ from aws_cdk import (
     aws_events as events,
     aws_events_targets as targets,
     Stack,
+    DockerImage,
     aws_lambda_event_sources as lambda_event_source
 )
 from constructs import Construct
@@ -21,6 +22,7 @@ import uuid
 import subprocess
 import aws_cdk as cdk
 from aws_cdk.aws_iam import PolicyStatement
+from cdk_lambda_layer_builder.constructs import BuildPyLayerAsset
 
 class VideoDubbingStack(Stack):
 
@@ -404,6 +406,36 @@ class VideoDubbingStack(Stack):
 
         #Add SQS event source to the Lambda function
         mergeAudioLambda.add_event_source(sqs_event_source)   
+
+
+        imageAnalysisRole = iam.Role(self, "ImageAnalysisRole",
+                                    assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"))
+        imageAnalysisRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
+        # read mp3 and put merged content
+        imageAnalysisRole.attach_inline_policy(s3CopyTargetPolicy)
+
+        
+
+        # Lambda that is called when Amazon Polly job completed
+        identifyGenderLambda = _lambda.Function(self, "IdentifyGenderLambda",
+                                    runtime=_lambda.Runtime.PYTHON_3_11,
+                                    handler="identify-gender.lambda_handler",
+                                    #code=_lambda.Code.from_asset("./lambda/images"),
+                                    code= _lambda.Code.from_asset("./lambda/images"), 
+                                    timeout=cdk.Duration.seconds(900),
+                                    memory_size=1024,
+                                    role = imageAnalysisRole,
+                                    environment={  
+                                                  "FFMPEG_PATH": '/opt/ffmpeg',
+                                                },
+                                     layers=[ffmpeg_layer]          
+                                    ) 
+        invokeBedrockRole = iam.Policy(self, "InvokeBedrock") 
+        invokeBedrockRole.add_statements(PolicyStatement(
+                    effect=iam.Effect.ALLOW,
+                    actions=["bedrock:InvokeModel"],
+                    resources=[identifyGenderLambda.function_arn]
+                ))                            
 
         CfnOutput(self, "Upload Audio File To This S3 bucket", value=sourceBucket.bucket_name)
         CfnOutput(self, "Staging files located here", value=stagingBucket.bucket_name)

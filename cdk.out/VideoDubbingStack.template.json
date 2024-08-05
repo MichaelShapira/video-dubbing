@@ -86,7 +86,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "166365b387786ac1b4349fcb5df3108e8f64ac9bc6470b08afba006fba44cded.zip"
+     "S3Key": "89c090c59a25925aa6e37682fd7a823b4a36013a64ca3a40e21ea7038f4ccb11.zip"
     },
     "Environment": {
      "Variables": {
@@ -110,7 +110,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/lambda_function/Resource",
-    "aws:asset:path": "asset.166365b387786ac1b4349fcb5df3108e8f64ac9bc6470b08afba006fba44cded",
+    "aws:asset:path": "asset.89c090c59a25925aa6e37682fd7a823b4a36013a64ca3a40e21ea7038f4ccb11",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -238,7 +238,8 @@
     "Managed": true
    },
    "DependsOn": [
-    "VideoDubbingFilesSourceAllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB08C58218"
+    "VideoDubbingFilesSourceAllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB08C58218",
+    "VideoDubbingFilesSourcePolicy9AA265B9"
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/VideoDubbingFilesSource/Notifications/Resource"
@@ -301,7 +302,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "6c1e9b465fa4b2d651dbc9ce3e732d8702a7b19137327684a71d89f1d355f1a2.zip"
+     "S3Key": "2eb6a831b107939f63cfebf68e6316e1a40f79fc99cae0fee9b333bac8d29bc4.zip"
     },
     "Timeout": 900,
     "MemorySize": 128,
@@ -312,7 +313,15 @@
       "Arn"
      ]
     },
-    "Runtime": "nodejs18.x",
+    "Runtime": {
+     "Fn::FindInMap": [
+      "LatestNodeRuntimeMap",
+      {
+       "Ref": "AWS::Region"
+      },
+      "value"
+     ]
+    },
     "Description": {
      "Fn::Join": [
       "",
@@ -331,7 +340,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
-    "aws:asset:path": "asset.6c1e9b465fa4b2d651dbc9ce3e732d8702a7b19137327684a71d89f1d355f1a2",
+    "aws:asset:path": "asset.2eb6a831b107939f63cfebf68e6316e1a40f79fc99cae0fee9b333bac8d29bc4",
     "aws:asset:property": "Code"
    }
   },
@@ -491,7 +500,7 @@
    "Properties": {
     "Description": "AWS CloudFormation handler for \"Custom::S3BucketNotifications\" resources (@aws-cdk/aws-s3)",
     "Code": {
-     "ZipFile": "import boto3  # type: ignore\nimport json\nimport logging\nimport urllib.request\n\ns3 = boto3.client(\"s3\")\n\nEVENTBRIDGE_CONFIGURATION = 'EventBridgeConfiguration'\nCONFIGURATION_TYPES = [\"TopicConfigurations\", \"QueueConfigurations\", \"LambdaFunctionConfigurations\"]\n\ndef handler(event: dict, context):\n  response_status = \"SUCCESS\"\n  error_message = \"\"\n  try:\n    props = event[\"ResourceProperties\"]\n    notification_configuration = props[\"NotificationConfiguration\"]\n    managed = props.get('Managed', 'true').lower() == 'true'\n    stack_id = event['StackId']\n    old = event.get(\"OldResourceProperties\", {}).get(\"NotificationConfiguration\", {})\n    if managed:\n      config = handle_managed(event[\"RequestType\"], notification_configuration)\n    else:\n      config = handle_unmanaged(props[\"BucketName\"], stack_id, event[\"RequestType\"], notification_configuration, old)\n    s3.put_bucket_notification_configuration(Bucket=props[\"BucketName\"], NotificationConfiguration=config)\n  except Exception as e:\n    logging.exception(\"Failed to put bucket notification configuration\")\n    response_status = \"FAILED\"\n    error_message = f\"Error: {str(e)}. \"\n  finally:\n    submit_response(event, context, response_status, error_message)\n\ndef handle_managed(request_type, notification_configuration):\n  if request_type == 'Delete':\n    return {}\n  return notification_configuration\n\ndef handle_unmanaged(bucket, stack_id, request_type, notification_configuration, old):\n  def with_id(n):\n    n['Id'] = f\"{stack_id}-{hash(json.dumps(n, sort_keys=True))}\"\n    return n\n\n  external_notifications = {}\n  existing_notifications = s3.get_bucket_notification_configuration(Bucket=bucket)\n  for t in CONFIGURATION_TYPES:\n    if request_type == 'Update':\n        ids = [with_id(n) for n in old.get(t, [])]\n        old_incoming_ids = [n['Id'] for n in ids]\n        external_notifications[t] = [n for n in existing_notifications.get(t, []) if not n['Id'] in old_incoming_ids]\n    elif request_type == 'Create':\n        external_notifications[t] = [n for n in existing_notifications.get(t, [])]\n  if EVENTBRIDGE_CONFIGURATION in existing_notifications:\n    external_notifications[EVENTBRIDGE_CONFIGURATION] = existing_notifications[EVENTBRIDGE_CONFIGURATION]\n\n  if request_type == 'Delete':\n    return external_notifications\n\n  notifications = {}\n  for t in CONFIGURATION_TYPES:\n    external = external_notifications.get(t, [])\n    incoming = [with_id(n) for n in notification_configuration.get(t, [])]\n    notifications[t] = external + incoming\n\n  if EVENTBRIDGE_CONFIGURATION in notification_configuration:\n    notifications[EVENTBRIDGE_CONFIGURATION] = notification_configuration[EVENTBRIDGE_CONFIGURATION]\n  elif EVENTBRIDGE_CONFIGURATION in external_notifications:\n    notifications[EVENTBRIDGE_CONFIGURATION] = external_notifications[EVENTBRIDGE_CONFIGURATION]\n\n  return notifications\n\ndef submit_response(event: dict, context, response_status: str, error_message: str):\n  response_body = json.dumps(\n    {\n      \"Status\": response_status,\n      \"Reason\": f\"{error_message}See the details in CloudWatch Log Stream: {context.log_stream_name}\",\n      \"PhysicalResourceId\": event.get(\"PhysicalResourceId\") or event[\"LogicalResourceId\"],\n      \"StackId\": event[\"StackId\"],\n      \"RequestId\": event[\"RequestId\"],\n      \"LogicalResourceId\": event[\"LogicalResourceId\"],\n      \"NoEcho\": False,\n    }\n  ).encode(\"utf-8\")\n  headers = {\"content-type\": \"\", \"content-length\": str(len(response_body))}\n  try:\n    req = urllib.request.Request(url=event[\"ResponseURL\"], headers=headers, data=response_body, method=\"PUT\")\n    with urllib.request.urlopen(req) as response:\n      print(response.read().decode(\"utf-8\"))\n    print(\"Status code: \" + response.reason)\n  except Exception as e:\n      print(\"send(..) failed executing request.urlopen(..): \" + str(e))\n"
+     "ZipFile": "import boto3  # type: ignore\nimport json\nimport logging\nimport urllib.request\n\ns3 = boto3.client(\"s3\")\n\nEVENTBRIDGE_CONFIGURATION = 'EventBridgeConfiguration'\nCONFIGURATION_TYPES = [\"TopicConfigurations\", \"QueueConfigurations\", \"LambdaFunctionConfigurations\"]\n\ndef handler(event: dict, context):\n  response_status = \"SUCCESS\"\n  error_message = \"\"\n  try:\n    props = event[\"ResourceProperties\"]\n    notification_configuration = props[\"NotificationConfiguration\"]\n    managed = props.get('Managed', 'true').lower() == 'true'\n    stack_id = event['StackId']\n    old = event.get(\"OldResourceProperties\", {}).get(\"NotificationConfiguration\", {})\n    if managed:\n      config = handle_managed(event[\"RequestType\"], notification_configuration)\n    else:\n      config = handle_unmanaged(props[\"BucketName\"], stack_id, event[\"RequestType\"], notification_configuration, old)\n    s3.put_bucket_notification_configuration(Bucket=props[\"BucketName\"], NotificationConfiguration=config)\n  except Exception as e:\n    logging.exception(\"Failed to put bucket notification configuration\")\n    response_status = \"FAILED\"\n    error_message = f\"Error: {str(e)}. \"\n  finally:\n    submit_response(event, context, response_status, error_message)\n\ndef handle_managed(request_type, notification_configuration):\n  if request_type == 'Delete':\n    return {}\n  return notification_configuration\n\ndef handle_unmanaged(bucket, stack_id, request_type, notification_configuration, old):\n  def with_id(n):\n    n['Id'] = f\"{stack_id}-{hash(json.dumps(n, sort_keys=True))}\"\n    return n\n\n  external_notifications = {}\n  existing_notifications = s3.get_bucket_notification_configuration(Bucket=bucket)\n  for t in CONFIGURATION_TYPES:\n    if request_type == 'Update':\n        ids = [with_id(n) for n in old.get(t, [])]\n        old_incoming_ids = [n['Id'] for n in ids]\n        external_notifications[t] = [n for n in existing_notifications.get(t, []) if not n['Id'] in old_incoming_ids]\n    elif request_type == 'Delete':\n        external_notifications[t] = [n for n in existing_notifications.get(t, []) if not n['Id'].startswith(f\"{stack_id}-\")]\n    elif request_type == 'Create':\n        external_notifications[t] = [n for n in existing_notifications.get(t, [])]\n  if EVENTBRIDGE_CONFIGURATION in existing_notifications:\n    external_notifications[EVENTBRIDGE_CONFIGURATION] = existing_notifications[EVENTBRIDGE_CONFIGURATION]\n\n  if request_type == 'Delete':\n    return external_notifications\n\n  notifications = {}\n  for t in CONFIGURATION_TYPES:\n    external = external_notifications.get(t, [])\n    incoming = [with_id(n) for n in notification_configuration.get(t, [])]\n    notifications[t] = external + incoming\n\n  if EVENTBRIDGE_CONFIGURATION in notification_configuration:\n    notifications[EVENTBRIDGE_CONFIGURATION] = notification_configuration[EVENTBRIDGE_CONFIGURATION]\n  elif EVENTBRIDGE_CONFIGURATION in external_notifications:\n    notifications[EVENTBRIDGE_CONFIGURATION] = external_notifications[EVENTBRIDGE_CONFIGURATION]\n\n  return notifications\n\ndef submit_response(event: dict, context, response_status: str, error_message: str):\n  response_body = json.dumps(\n    {\n      \"Status\": response_status,\n      \"Reason\": f\"{error_message}See the details in CloudWatch Log Stream: {context.log_stream_name}\",\n      \"PhysicalResourceId\": event.get(\"PhysicalResourceId\") or event[\"LogicalResourceId\"],\n      \"StackId\": event[\"StackId\"],\n      \"RequestId\": event[\"RequestId\"],\n      \"LogicalResourceId\": event[\"LogicalResourceId\"],\n      \"NoEcho\": False,\n    }\n  ).encode(\"utf-8\")\n  headers = {\"content-type\": \"\", \"content-length\": str(len(response_body))}\n  try:\n    req = urllib.request.Request(url=event[\"ResponseURL\"], headers=headers, data=response_body, method=\"PUT\")\n    with urllib.request.urlopen(req) as response:\n      print(response.read().decode(\"utf-8\"))\n    print(\"Status code: \" + response.reason)\n  except Exception as e:\n      print(\"send(..) failed executing request.urlopen(..): \" + str(e))\n"
     },
     "Handler": "index.handler",
     "Role": {
@@ -500,7 +509,7 @@
       "Arn"
      ]
     },
-    "Runtime": "python3.9",
+    "Runtime": "python3.11",
     "Timeout": 300
    },
    "DependsOn": [
@@ -776,6 +785,9 @@
      },
      {
       "Ref": "MergeAudioRoleC83AD2DD"
+     },
+     {
+      "Ref": "ImageAnalysisRoleEB85118A"
      }
     ]
    },
@@ -789,7 +801,10 @@
     "PolicyDocument": {
      "Statement": [
       {
-       "Action": "translate:TranslateText",
+       "Action": [
+        "translate:ListLanguages",
+        "translate:TranslateText"
+       ],
        "Effect": "Allow",
        "Resource": "*"
       }
@@ -805,6 +820,30 @@
    },
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/TranslateTextPolicy/Resource"
+   }
+  },
+  "DescribeVoicesPolicyFF4A57CF": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "polly:DescribeVoices",
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "DescribeVoicesPolicyFF4A57CF",
+    "Roles": [
+     {
+      "Ref": "SummarizeLambdaRole4DE425CC"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/DescribeVoicesPolicy/Resource"
    }
   },
   "VideoDubbingDLQFF6409FE": {
@@ -902,7 +941,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "166365b387786ac1b4349fcb5df3108e8f64ac9bc6470b08afba006fba44cded.zip"
+     "S3Key": "89c090c59a25925aa6e37682fd7a823b4a36013a64ca3a40e21ea7038f4ccb11.zip"
     },
     "Environment": {
      "Variables": {
@@ -935,7 +974,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/VideoDubbingTranscribeEventCompleted/Resource",
-    "aws:asset:path": "asset.166365b387786ac1b4349fcb5df3108e8f64ac9bc6470b08afba006fba44cded",
+    "aws:asset:path": "asset.89c090c59a25925aa6e37682fd7a823b4a36013a64ca3a40e21ea7038f4ccb11",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1158,7 +1197,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "d2ba87f6cb07d612920b2ab67c6ff83b43a539b2dd915d37b4f8ad8b9293df18.zip"
+     "S3Key": "79d03acfe04ac54f347a785f404b93da57f19489097516045d50a07bfd523418.zip"
     },
     "Environment": {
      "Variables": {
@@ -1172,7 +1211,6 @@
        "Ref": "VideoDubbingStagingCD98B579"
       },
       "POLLY_LANGUAGE_CODE": "ru-RU",
-      "POLLY_VOICE_ID": "Tatyana",
       "POLLY_JOBS_SNS_ARN": {
        "Ref": "VideoDubbingPollyJobsD6E6C2C7"
       }
@@ -1195,7 +1233,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly/Resource",
-    "aws:asset:path": "asset.d2ba87f6cb07d612920b2ab67c6ff83b43a539b2dd915d37b4f8ad8b9293df18",
+    "aws:asset:path": "asset.79d03acfe04ac54f347a785f404b93da57f19489097516045d50a07bfd523418",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1230,7 +1268,7 @@
      },
      "maxReceiveCount": 5
     },
-    "VisibilityTimeout": 120
+    "VisibilityTimeout": 950
    },
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete",
@@ -1349,7 +1387,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "d2ba87f6cb07d612920b2ab67c6ff83b43a539b2dd915d37b4f8ad8b9293df18.zip"
+     "S3Key": "79d03acfe04ac54f347a785f404b93da57f19489097516045d50a07bfd523418.zip"
     },
     "Environment": {
      "Variables": {
@@ -1383,7 +1421,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/PolyJobCompletedLambda/Resource",
-    "aws:asset:path": "asset.d2ba87f6cb07d612920b2ab67c6ff83b43a539b2dd915d37b4f8ad8b9293df18",
+    "aws:asset:path": "asset.79d03acfe04ac54f347a785f404b93da57f19489097516045d50a07bfd523418",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1723,7 +1761,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "a47c239c4b1ed2d3ff6a312eb5dcb01714b7e8ddae015d4a547be0b267261540.zip"
+     "S3Key": "86ef67a36378b0114bc36f0551b2c6e68b1ea0db7c9ba10328c848d6bed82d77.zip"
     },
     "Environment": {
      "Variables": {
@@ -1737,7 +1775,10 @@
       "SNS_EMAIL_TOPIC": {
        "Ref": "VideoDubbingEmail8BE6995A"
       },
-      "FFMPEG_PATH": "/var/task/bin/ffmpeg"
+      "FFMPEG_PATH": "/var/task/bin/ffmpeg",
+      "EMAIL_ADDRESS": {
+       "Ref": "snstopicemailparam"
+      }
      }
     },
     "Handler": "merge-audio.lambda_handler",
@@ -1762,7 +1803,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/MergeAudioLambda/Resource",
-    "aws:asset:path": "asset.a47c239c4b1ed2d3ff6a312eb5dcb01714b7e8ddae015d4a547be0b267261540",
+    "aws:asset:path": "asset.86ef67a36378b0114bc36f0551b2c6e68b1ea0db7c9ba10328c848d6bed82d77",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1784,15 +1825,183 @@
     "aws:cdk:path": "VideoDubbingStack/MergeAudioLambda/SqsEventSource:VideoDubbingStackMergeAudio17D95257/Resource"
    }
   },
+  "ImageAnalysisRoleEB85118A": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/ImageAnalysisRole/Resource"
+   }
+  },
+  "IdentifyGenderLambdaC3147987": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "8e41564fffda483776e2749ce5f58f203704f683d8d4a30d9ee8520c4c961e2b.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "FFMPEG_PATH": "/opt/ffmpeg"
+     }
+    },
+    "Handler": "identify-gender.lambda_handler",
+    "Layers": [
+     {
+      "Ref": "FFmpegLayer65FCD2A8"
+     }
+    ],
+    "MemorySize": 1024,
+    "Role": {
+     "Fn::GetAtt": [
+      "ImageAnalysisRoleEB85118A",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.11",
+    "Timeout": 900
+   },
+   "DependsOn": [
+    "ImageAnalysisRoleEB85118A"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/IdentifyGenderLambda/Resource",
+    "aws:asset:path": "asset.8e41564fffda483776e2749ce5f58f203704f683d8d4a30d9ee8520c4c961e2b",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/22QTU7DMBCFz9K9a2hyAloBG5BCW3VbTZyhNfFP8NhFUZS7YzulBInVvPeN7fG8gq/Kkt8v4IuWommXStZ82HkQLYvoOEjQfNhahWzzbnKtrJKiT3ZSI1Og6wb48BSM8NKa1JvrCp2WRMk9XtD4nQ1O4Ct0nTSndOAf+gI9ugM6ur4x9yOj8ghE6Ik/pBI9H9ZBtOjXQMgmma5d1VR+fz73I2t6A9o2cfE91AoPRTryrGwNKoORYfogxSDCNYiQKH1G9BYwZJZFhCbCve2kSHASu1CTcLL7CWTux5FtkfLuLC8Twz/lXAJ5q2+9NPWm/7QqZy+yQZdXT3GDA40eXTIbaxqZ57Cq92dr7kq+Knix+CAply4YLzXy7VS/AaYcRywNAgAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/22QzU7DMBCEn6V319AUcacVcAER2qrXauMsxcQ/wWsXRVHeHdspJUicdubz2uudgi9ubvn1DL5oLupmrmTF+60H0bCIDr0EzfuNVcjWbybX0iopumRHNTAFuqqB9w/BCC+tSWdTXaLTkii5+xMav7XBCXyGtpXmmBr+oU/Qodujo/MbUz8wWh6ACD3xu1Si5/0qiAb9CgjZKNO1sxrL78+nfmB1Z0DbOi6+g0rhvkgtj8pWoDIYGKYPUgwinIMIidJnRK8BQ2ZZRGgi3NlWigRHsQ0VCSfbn0CmfhjYBinvzvIyMfxjziWQt/pylqZO9CW9P12lsydZo8sppOTBgUaPLpmX4NuQU1lbU8s8nJWdf7fmaskXBS9mHyTl3AXjpUa+Ges39MaYAiICAAA="
    },
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/CDKMetadata/Default"
    },
    "Condition": "CDKMetadataAvailable"
+  }
+ },
+ "Mappings": {
+  "LatestNodeRuntimeMap": {
+   "af-south-1": {
+    "value": "nodejs20.x"
+   },
+   "ap-east-1": {
+    "value": "nodejs20.x"
+   },
+   "ap-northeast-1": {
+    "value": "nodejs20.x"
+   },
+   "ap-northeast-2": {
+    "value": "nodejs20.x"
+   },
+   "ap-northeast-3": {
+    "value": "nodejs20.x"
+   },
+   "ap-south-1": {
+    "value": "nodejs20.x"
+   },
+   "ap-south-2": {
+    "value": "nodejs20.x"
+   },
+   "ap-southeast-1": {
+    "value": "nodejs20.x"
+   },
+   "ap-southeast-2": {
+    "value": "nodejs20.x"
+   },
+   "ap-southeast-3": {
+    "value": "nodejs20.x"
+   },
+   "ap-southeast-4": {
+    "value": "nodejs20.x"
+   },
+   "ca-central-1": {
+    "value": "nodejs20.x"
+   },
+   "cn-north-1": {
+    "value": "nodejs18.x"
+   },
+   "cn-northwest-1": {
+    "value": "nodejs18.x"
+   },
+   "eu-central-1": {
+    "value": "nodejs20.x"
+   },
+   "eu-central-2": {
+    "value": "nodejs20.x"
+   },
+   "eu-north-1": {
+    "value": "nodejs20.x"
+   },
+   "eu-south-1": {
+    "value": "nodejs20.x"
+   },
+   "eu-south-2": {
+    "value": "nodejs20.x"
+   },
+   "eu-west-1": {
+    "value": "nodejs20.x"
+   },
+   "eu-west-2": {
+    "value": "nodejs20.x"
+   },
+   "eu-west-3": {
+    "value": "nodejs20.x"
+   },
+   "il-central-1": {
+    "value": "nodejs20.x"
+   },
+   "me-central-1": {
+    "value": "nodejs20.x"
+   },
+   "me-south-1": {
+    "value": "nodejs20.x"
+   },
+   "sa-east-1": {
+    "value": "nodejs20.x"
+   },
+   "us-east-1": {
+    "value": "nodejs20.x"
+   },
+   "us-east-2": {
+    "value": "nodejs20.x"
+   },
+   "us-west-1": {
+    "value": "nodejs20.x"
+   },
+   "us-west-2": {
+    "value": "nodejs20.x"
+   }
   }
  },
  "Parameters": {
@@ -1803,6 +2012,33 @@
    "Type": "AWS::SSM::Parameter::Value<String>",
    "Default": "/cdk-bootstrap/hnb659fds/version",
    "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Outputs": {
+  "UploadAudioFileToThisS3bucket": {
+   "Value": {
+    "Ref": "VideoDubbingFilesSource65A974C7"
+   }
+  },
+  "Stagingfileslocatedhere": {
+   "Value": {
+    "Ref": "VideoDubbingStagingCD98B579"
+   }
+  },
+  "StartTranscribeJobLambda": {
+   "Value": {
+    "Ref": "lambdafunction45C982D3"
+   }
+  },
+  "PollyJobLambda": {
+   "Value": {
+    "Ref": "VideoDubbingConvertSubsToPollyCA61E95F"
+   }
+  },
+  "ProcessTranscribeJobResultLambda": {
+   "Value": {
+    "Ref": "VideoDubbingTranscribeEventCompleted8766254A"
+   }
   }
  },
  "Conditions": {

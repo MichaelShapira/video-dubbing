@@ -1,0 +1,4 @@
+requests
+numpy
+opencv-python-headless
+Pillow==9.5.0

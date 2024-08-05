@@ -1,0 +1,1435 @@
+Resources:
+  TranscribeForDubbingLambdaRoleEBA9A27D:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/TranscribeForDubbingLambdaRole/Resource
+  TranscribeForDubbingLambdaRoleDefaultPolicy996C6622:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: transcribe:StartTranscriptionJob
+            Effect: Allow
+            Resource: "*"
+          - Action:
+              - s3:GetObject
+              - s3:PutObject
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - Fn::GetAtt:
+                      - VideoDubbingFilesSource65A974C7
+                      - Arn
+                  - /*
+        Version: "2012-10-17"
+      PolicyName: TranscribeForDubbingLambdaRoleDefaultPolicy996C6622
+      Roles:
+        - Ref: TranscribeForDubbingLambdaRoleEBA9A27D
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/TranscribeForDubbingLambdaRole/DefaultPolicy/Resource
+  lambdafunction45C982D3:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: 89c090c59a25925aa6e37682fd7a823b4a36013a64ca3a40e21ea7038f4ccb11.zip
+      Environment:
+        Variables:
+          AUDIO_LANGUAGE: en-US
+      Handler: video-dubbing-start-transcribe.lambda_handler
+      MemorySize: 256
+      Role:
+        Fn::GetAtt:
+          - TranscribeForDubbingLambdaRoleEBA9A27D
+          - Arn
+      Runtime: python3.11
+      Timeout: 30
+    DependsOn:
+      - TranscribeForDubbingLambdaRoleDefaultPolicy996C6622
+      - TranscribeForDubbingLambdaRoleEBA9A27D
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/lambda_function/Resource
+      aws:asset:path: /Users/michshap/Documents/Code/GitHub/video-dubbing-git/lambda/transcribe
+      aws:asset:is-bundled: false
+      aws:asset:property: Code
+  VideoDubbingFilesSource65A974C7:
+    Type: AWS::S3::Bucket
+    Properties:
+      Tags:
+        - Key: aws-cdk:auto-delete-objects
+          Value: "true"
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingFilesSource/Resource
+  VideoDubbingFilesSourcePolicy9AA265B9:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: VideoDubbingFilesSource65A974C7
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:DeleteObject*
+              - s3:GetBucket*
+              - s3:List*
+              - s3:PutBucketPolicy
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092
+                  - Arn
+            Resource:
+              - Fn::GetAtt:
+                  - VideoDubbingFilesSource65A974C7
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - VideoDubbingFilesSource65A974C7
+                        - Arn
+                    - /*
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingFilesSource/Policy/Resource
+  VideoDubbingFilesSourceAutoDeleteObjectsCustomResourceB633A2B8:
+    Type: Custom::S3AutoDeleteObjects
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F
+          - Arn
+      BucketName:
+        Ref: VideoDubbingFilesSource65A974C7
+    DependsOn:
+      - VideoDubbingFilesSourcePolicy9AA265B9
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingFilesSource/AutoDeleteObjectsCustomResource/Default
+  VideoDubbingFilesSourceNotificationsF0B19EC4:
+    Type: Custom::S3BucketNotifications
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691
+          - Arn
+      BucketName:
+        Ref: VideoDubbingFilesSource65A974C7
+      NotificationConfiguration:
+        LambdaFunctionConfigurations:
+          - Events:
+              - s3:ObjectCreated:*
+            LambdaFunctionArn:
+              Fn::GetAtt:
+                - lambdafunction45C982D3
+                - Arn
+      Managed: true
+    DependsOn:
+      - VideoDubbingFilesSourceAllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB08C58218
+      - VideoDubbingFilesSourcePolicy9AA265B9
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingFilesSource/Notifications/Resource
+  VideoDubbingFilesSourceAllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB08C58218:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - lambdafunction45C982D3
+          - Arn
+      Principal: s3.amazonaws.com
+      SourceAccount:
+        Ref: AWS::AccountId
+      SourceArn:
+        Fn::GetAtt:
+          - VideoDubbingFilesSource65A974C7
+          - Arn
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingFilesSource/AllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB
+  CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+      ManagedPolicyArns:
+        - Fn::Sub: arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role
+  CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: 2eb6a831b107939f63cfebf68e6316e1a40f79fc99cae0fee9b333bac8d29bc4.zip
+      Timeout: 900
+      MemorySize: 128
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092
+          - Arn
+      Runtime:
+        Fn::FindInMap:
+          - LatestNodeRuntimeMap
+          - Ref: AWS::Region
+          - value
+      Description:
+        Fn::Join:
+          - ""
+          - - "Lambda function for auto-deleting objects in "
+            - Ref: VideoDubbingFilesSource65A974C7
+            - " S3 bucket."
+    DependsOn:
+      - CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler
+      aws:asset:path: /private/var/folders/80/_74sgw3x6vs73ygk50ktwtwc0000gr/T/cdk-custom-resourceFEQBBq
+      aws:asset:property: Code
+  VideoDubbingStagingCD98B579:
+    Type: AWS::S3::Bucket
+    Properties:
+      Tags:
+        - Key: aws-cdk:auto-delete-objects
+          Value: "true"
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingStaging/Resource
+  VideoDubbingStagingPolicyF285A143:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: VideoDubbingStagingCD98B579
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:DeleteObject*
+              - s3:GetBucket*
+              - s3:List*
+              - s3:PutBucketPolicy
+            Effect: Allow
+            Principal:
+              AWS:
+                Fn::GetAtt:
+                  - CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092
+                  - Arn
+            Resource:
+              - Fn::GetAtt:
+                  - VideoDubbingStagingCD98B579
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - VideoDubbingStagingCD98B579
+                        - Arn
+                    - /*
+        Version: "2012-10-17"
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingStaging/Policy/Resource
+  VideoDubbingStagingAutoDeleteObjectsCustomResource30B184CD:
+    Type: Custom::S3AutoDeleteObjects
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F
+          - Arn
+      BucketName:
+        Ref: VideoDubbingStagingCD98B579
+    DependsOn:
+      - VideoDubbingStagingPolicyF285A143
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingStaging/AutoDeleteObjectsCustomResource/Default
+  BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/Resource
+  BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: s3:PutBucketNotification
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36
+      Roles:
+        - Ref: BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/DefaultPolicy/Resource
+  BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: AWS CloudFormation handler for "Custom::S3BucketNotifications" resources (@aws-cdk/aws-s3)
+      Code:
+        ZipFile: |
+          import boto3  # type: ignore
+          import json
+          import logging
+          import urllib.request
+
+          s3 = boto3.client("s3")
+
+          EVENTBRIDGE_CONFIGURATION = 'EventBridgeConfiguration'
+          CONFIGURATION_TYPES = ["TopicConfigurations", "QueueConfigurations", "LambdaFunctionConfigurations"]
+
+          def handler(event: dict, context):
+            response_status = "SUCCESS"
+            error_message = ""
+            try:
+              props = event["ResourceProperties"]
+              notification_configuration = props["NotificationConfiguration"]
+              managed = props.get('Managed', 'true').lower() == 'true'
+              stack_id = event['StackId']
+              old = event.get("OldResourceProperties", {}).get("NotificationConfiguration", {})
+              if managed:
+                config = handle_managed(event["RequestType"], notification_configuration)
+              else:
+                config = handle_unmanaged(props["BucketName"], stack_id, event["RequestType"], notification_configuration, old)
+              s3.put_bucket_notification_configuration(Bucket=props["BucketName"], NotificationConfiguration=config)
+            except Exception as e:
+              logging.exception("Failed to put bucket notification configuration")
+              response_status = "FAILED"
+              error_message = f"Error: {str(e)}. "
+            finally:
+              submit_response(event, context, response_status, error_message)
+
+          def handle_managed(request_type, notification_configuration):
+            if request_type == 'Delete':
+              return {}
+            return notification_configuration
+
+          def handle_unmanaged(bucket, stack_id, request_type, notification_configuration, old):
+            def with_id(n):
+              n['Id'] = f"{stack_id}-{hash(json.dumps(n, sort_keys=True))}"
+              return n
+
+            external_notifications = {}
+            existing_notifications = s3.get_bucket_notification_configuration(Bucket=bucket)
+            for t in CONFIGURATION_TYPES:
+              if request_type == 'Update':
+                  ids = [with_id(n) for n in old.get(t, [])]
+                  old_incoming_ids = [n['Id'] for n in ids]
+                  external_notifications[t] = [n for n in existing_notifications.get(t, []) if not n['Id'] in old_incoming_ids]
+              elif request_type == 'Delete':
+                  external_notifications[t] = [n for n in existing_notifications.get(t, []) if not n['Id'].startswith(f"{stack_id}-")]
+              elif request_type == 'Create':
+                  external_notifications[t] = [n for n in existing_notifications.get(t, [])]
+            if EVENTBRIDGE_CONFIGURATION in existing_notifications:
+              external_notifications[EVENTBRIDGE_CONFIGURATION] = existing_notifications[EVENTBRIDGE_CONFIGURATION]
+
+            if request_type == 'Delete':
+              return external_notifications
+
+            notifications = {}
+            for t in CONFIGURATION_TYPES:
+              external = external_notifications.get(t, [])
+              incoming = [with_id(n) for n in notification_configuration.get(t, [])]
+              notifications[t] = external + incoming
+
+            if EVENTBRIDGE_CONFIGURATION in notification_configuration:
+              notifications[EVENTBRIDGE_CONFIGURATION] = notification_configuration[EVENTBRIDGE_CONFIGURATION]
+            elif EVENTBRIDGE_CONFIGURATION in external_notifications:
+              notifications[EVENTBRIDGE_CONFIGURATION] = external_notifications[EVENTBRIDGE_CONFIGURATION]
+
+            return notifications
+
+          def submit_response(event: dict, context, response_status: str, error_message: str):
+            response_body = json.dumps(
+              {
+                "Status": response_status,
+                "Reason": f"{error_message}See the details in CloudWatch Log Stream: {context.log_stream_name}",
+                "PhysicalResourceId": event.get("PhysicalResourceId") or event["LogicalResourceId"],
+                "StackId": event["StackId"],
+                "RequestId": event["RequestId"],
+                "LogicalResourceId": event["LogicalResourceId"],
+                "NoEcho": False,
+              }
+            ).encode("utf-8")
+            headers = {"content-type": "", "content-length": str(len(response_body))}
+            try:
+              req = urllib.request.Request(url=event["ResponseURL"], headers=headers, data=response_body, method="PUT")
+              with urllib.request.urlopen(req) as response:
+                print(response.read().decode("utf-8"))
+              print("Status code: " + response.reason)
+            except Exception as e:
+                print("send(..) failed executing request.urlopen(..): " + str(e))
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC
+          - Arn
+      Runtime: python3.11
+      Timeout: 300
+    DependsOn:
+      - BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36
+      - BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Resource
+  VideoDubbungStatusBC5B51B6:
+    Type: AWS::DynamoDB::GlobalTable
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: dubbing_job_id
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: dubbing_job_id
+          KeyType: HASH
+      Replicas:
+        - Region:
+            Ref: AWS::Region
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbungStatus/Resource
+  VideoDubbungPollyJobStatus67E8C401:
+    Type: AWS::DynamoDB::GlobalTable
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: polly_job_id
+          AttributeType: S
+        - AttributeName: dubbing_job_id
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      GlobalSecondaryIndexes:
+        - IndexName: dubbing_job_id_index
+          KeySchema:
+            - AttributeName: dubbing_job_id
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      KeySchema:
+        - AttributeName: polly_job_id
+          KeyType: HASH
+      Replicas:
+        - GlobalSecondaryIndexes:
+            - IndexName: dubbing_job_id_index
+          Region:
+            Ref: AWS::Region
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbungPollyJobStatus/Resource
+  VideoDubbingTranscribeEvent842FCAF9:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Completed Transcription Jobs
+      EventPattern:
+        detail:
+          TranscriptionJobStatus:
+            - COMPLETED
+        source:
+          - aws.transcribe
+      State: ENABLED
+      Targets:
+        - Arn:
+            Fn::GetAtt:
+              - VideoDubbingTranscribeEventCompleted8766254A
+              - Arn
+          Id: Target0
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingTranscribeEvent/Resource
+  VideoDubbingTranscribeEventAllowEventRuleVideoDubbingStackVideoDubbingTranscribeEventCompletedE2CA318333F7BA77:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - VideoDubbingTranscribeEventCompleted8766254A
+          - Arn
+      Principal: events.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - VideoDubbingTranscribeEvent842FCAF9
+          - Arn
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingTranscribeEvent/AllowEventRuleVideoDubbingStackVideoDubbingTranscribeEventCompletedE2CA3183
+  SummarizeLambdaRole4DE425CC:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/SummarizeLambdaRole/Resource
+  S3CopySourcePolicy925A6918:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject
+              - s3:ListBucket
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - VideoDubbingFilesSource65A974C7
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - VideoDubbingFilesSource65A974C7
+                        - Arn
+                    - /*
+        Version: "2012-10-17"
+      PolicyName: S3CopySourcePolicy925A6918
+      Roles:
+        - Ref: SummarizeLambdaRole4DE425CC
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/S3CopySourcePolicy/Resource
+  S3CopyTargetPolicy17A699BC:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject
+              - s3:PutObject
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - VideoDubbingStagingCD98B579
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - VideoDubbingStagingCD98B579
+                        - Arn
+                    - /*
+        Version: "2012-10-17"
+      PolicyName: S3CopyTargetPolicy17A699BC
+      Roles:
+        - Ref: SummarizeLambdaRole4DE425CC
+        - Ref: ConvertSubtitlesToPollyLambdaRole885734CA
+        - Ref: MergeAudioRoleC83AD2DD
+        - Ref: ImageAnalysisRoleEB85118A
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/S3CopyTargetPolicy/Resource
+  TranslateTextPolicyAECBBE52:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - translate:ListLanguages
+              - translate:TranslateText
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: TranslateTextPolicyAECBBE52
+      Roles:
+        - Ref: SummarizeLambdaRole4DE425CC
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/TranslateTextPolicy/Resource
+  DescribeVoicesPolicyFF4A57CF:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: polly:DescribeVoices
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: DescribeVoicesPolicyFF4A57CF
+      Roles:
+        - Ref: SummarizeLambdaRole4DE425CC
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/DescribeVoicesPolicy/Resource
+  VideoDubbingDLQFF6409FE:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 900
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingDLQ/Resource
+  SrtToPollyE9339DB3:
+    Type: AWS::SQS::Queue
+    Properties:
+      ReceiveMessageWaitTimeSeconds: 20
+      RedrivePolicy:
+        deadLetterTargetArn:
+          Fn::GetAtt:
+            - VideoDubbingDLQFF6409FE
+            - Arn
+        maxReceiveCount: 5
+      VisibilityTimeout: 120
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/SrtToPolly/Resource
+  SqsPutMessagePolicyB48DC4CB:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - sqs:GetQueueUrl
+              - sqs:SendMessage
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - SrtToPollyE9339DB3
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: SqsPutMessagePolicyB48DC4CB
+      Roles:
+        - Ref: SummarizeLambdaRole4DE425CC
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/SqsPutMessagePolicy/Resource
+  getTranscribeJobPolicy5B728626:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: transcribe:GetTranscriptionJob
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: getTranscribeJobPolicy5B728626
+      Roles:
+        - Ref: SummarizeLambdaRole4DE425CC
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/getTranscribeJobPolicy/Resource
+  VideoDubbingTranscribeEventCompleted8766254A:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: 89c090c59a25925aa6e37682fd7a823b4a36013a64ca3a40e21ea7038f4ccb11.zip
+      Environment:
+        Variables:
+          AUDIO_LANGUAGE_SOURCE: en
+          AUDIO_LANGUAGE_TARGET: ru
+          SQS_QUEUE_NAME:
+            Fn::GetAtt:
+              - SrtToPollyE9339DB3
+              - QueueName
+          STAGING_BUCKET_NAME:
+            Ref: VideoDubbingStagingCD98B579
+      Handler: process-transcribe-result.lambda_handler
+      MemorySize: 512
+      Role:
+        Fn::GetAtt:
+          - SummarizeLambdaRole4DE425CC
+          - Arn
+      Runtime: python3.11
+      Timeout: 60
+    DependsOn:
+      - SummarizeLambdaRole4DE425CC
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingTranscribeEventCompleted/Resource
+      aws:asset:path: /Users/michshap/Documents/Code/GitHub/video-dubbing-git/lambda/transcribe
+      aws:asset:is-bundled: false
+      aws:asset:property: Code
+  VideoDubbingPollyJobsD6E6C2C7:
+    Type: AWS::SNS::Topic
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingPollyJobs/Resource
+  ConvertSubtitlesToPollyLambdaRole885734CA:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/ConvertSubtitlesToPollyLambdaRole/Resource
+  ConvertSubtitlesToPollyLambdaRoleDefaultPolicyF7A517DF:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - sqs:ChangeMessageVisibility
+              - sqs:DeleteMessage
+              - sqs:GetQueueAttributes
+              - sqs:GetQueueUrl
+              - sqs:ReceiveMessage
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - SrtToPollyE9339DB3
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: ConvertSubtitlesToPollyLambdaRoleDefaultPolicyF7A517DF
+      Roles:
+        - Ref: ConvertSubtitlesToPollyLambdaRole885734CA
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/ConvertSubtitlesToPollyLambdaRole/DefaultPolicy/Resource
+  SqsGetMessagePolicyAD1F9B64:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - sqs:DeleteMessage
+              - sqs:GetQueueUrl
+              - sqs:SendMessage
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - SrtToPollyE9339DB3
+                - Arn
+          - Action:
+              - sqs:GetQueueUrl
+              - sqs:SendMessage
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - MergeAudio2D8ED7DE
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: SqsGetMessagePolicyAD1F9B64
+      Roles:
+        - Ref: ConvertSubtitlesToPollyLambdaRole885734CA
+        - Ref: PolyJobCompletedRole832B969F
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/SqsGetMessagePolicy/Resource
+  PollyStartSpeechSynthesisTaskPolicy9EA3B680:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: polly:StartSpeechSynthesisTask
+            Effect: Allow
+            Resource: "*"
+        Version: "2012-10-17"
+      PolicyName: PollyStartSpeechSynthesisTaskPolicy9EA3B680
+      Roles:
+        - Ref: ConvertSubtitlesToPollyLambdaRole885734CA
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/PollyStartSpeechSynthesisTaskPolicy/Resource
+  DynamoPutItemPolicy16302363:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: dynamodb:PutItem
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - VideoDubbungPollyJobStatus67E8C401
+                  - Arn
+              - Fn::GetAtt:
+                  - VideoDubbungStatusBC5B51B6
+                  - Arn
+        Version: "2012-10-17"
+      PolicyName: DynamoPutItemPolicy16302363
+      Roles:
+        - Ref: ConvertSubtitlesToPollyLambdaRole885734CA
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/DynamoPutItemPolicy/Resource
+  SnsPollyJobNotificationPolicy6CFF3A00:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: sns:Publish
+            Effect: Allow
+            Resource:
+              Ref: VideoDubbingPollyJobsD6E6C2C7
+        Version: "2012-10-17"
+      PolicyName: SnsPollyJobNotificationPolicy6CFF3A00
+      Roles:
+        - Ref: ConvertSubtitlesToPollyLambdaRole885734CA
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/SnsPollyJobNotificationPolicy/Resource
+  VideoDubbingConvertSubsToPollyCA61E95F:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: 79d03acfe04ac54f347a785f404b93da57f19489097516045d50a07bfd523418.zip
+      Environment:
+        Variables:
+          DYNAMO_DUBBING_STATUS_TABLE:
+            Ref: VideoDubbungStatusBC5B51B6
+          DYNAMO_POLLY_JOBS_TABLE:
+            Ref: VideoDubbungPollyJobStatus67E8C401
+          STAGING_BUCKET_NAME:
+            Ref: VideoDubbingStagingCD98B579
+          POLLY_LANGUAGE_CODE: ru-RU
+          POLLY_JOBS_SNS_ARN:
+            Ref: VideoDubbingPollyJobsD6E6C2C7
+      Handler: srt-to-polly.lambda_handler
+      MemorySize: 512
+      Role:
+        Fn::GetAtt:
+          - ConvertSubtitlesToPollyLambdaRole885734CA
+          - Arn
+      Runtime: python3.11
+      Timeout: 60
+    DependsOn:
+      - ConvertSubtitlesToPollyLambdaRoleDefaultPolicyF7A517DF
+      - ConvertSubtitlesToPollyLambdaRole885734CA
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingConvertSubsToPolly/Resource
+      aws:asset:path: /Users/michshap/Documents/Code/GitHub/video-dubbing-git/lambda/polly
+      aws:asset:is-bundled: false
+      aws:asset:property: Code
+  VideoDubbingConvertSubsToPollySqsEventSourceVideoDubbingStackSrtToPollyF5A9260DE0086275:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn:
+        Fn::GetAtt:
+          - SrtToPollyE9339DB3
+          - Arn
+      FunctionName:
+        Ref: VideoDubbingConvertSubsToPollyCA61E95F
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingConvertSubsToPolly/SqsEventSource:VideoDubbingStackSrtToPollyF5A9260D/Resource
+  MergeAudio2D8ED7DE:
+    Type: AWS::SQS::Queue
+    Properties:
+      ReceiveMessageWaitTimeSeconds: 20
+      RedrivePolicy:
+        deadLetterTargetArn:
+          Fn::GetAtt:
+            - VideoDubbingDLQFF6409FE
+            - Arn
+        maxReceiveCount: 5
+      VisibilityTimeout: 950
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/MergeAudio/Resource
+  PolyJobCompletedRole832B969F:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/PolyJobCompletedRole/Resource
+  DynamoPutGetItemPolicyFC7FE052:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - VideoDubbungPollyJobStatus67E8C401
+                  - Arn
+              - Fn::GetAtt:
+                  - VideoDubbungStatusBC5B51B6
+                  - Arn
+        Version: "2012-10-17"
+      PolicyName: DynamoPutGetItemPolicyFC7FE052
+      Roles:
+        - Ref: PolyJobCompletedRole832B969F
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/DynamoPutGetItemPolicy/Resource
+  SnsPollyJobCompletedNotificationPolicyD63A5C67:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - sns:GetTopicAttributes
+              - sns:Receive
+            Effect: Allow
+            Resource:
+              Ref: VideoDubbingPollyJobsD6E6C2C7
+        Version: "2012-10-17"
+      PolicyName: SnsPollyJobCompletedNotificationPolicyD63A5C67
+      Roles:
+        - Ref: PolyJobCompletedRole832B969F
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/SnsPollyJobCompletedNotificationPolicy/Resource
+  PolyJobCompletedLambdaAEBB5A1E:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: 79d03acfe04ac54f347a785f404b93da57f19489097516045d50a07bfd523418.zip
+      Environment:
+        Variables:
+          DYNAMO_DUBBING_STATUS_TABLE:
+            Ref: VideoDubbungStatusBC5B51B6
+          DYNAMO_POLLY_JOBS_TABLE:
+            Ref: VideoDubbungPollyJobStatus67E8C401
+          SQS_MERGE_AUDIO:
+            Fn::GetAtt:
+              - MergeAudio2D8ED7DE
+              - QueueName
+      Handler: process-polly-task-result.lambda_handler
+      MemorySize: 128
+      Role:
+        Fn::GetAtt:
+          - PolyJobCompletedRole832B969F
+          - Arn
+      Runtime: python3.11
+      Timeout: 60
+    DependsOn:
+      - PolyJobCompletedRole832B969F
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/PolyJobCompletedLambda/Resource
+      aws:asset:path: /Users/michshap/Documents/Code/GitHub/video-dubbing-git/lambda/polly
+      aws:asset:is-bundled: false
+      aws:asset:property: Code
+  PolyJobCompletedLambdaAllowInvokeVideoDubbingStackVideoDubbingPollyJobs00FD9F22B63F995C:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - PolyJobCompletedLambdaAEBB5A1E
+          - Arn
+      Principal: sns.amazonaws.com
+      SourceArn:
+        Ref: VideoDubbingPollyJobsD6E6C2C7
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/PolyJobCompletedLambda/AllowInvoke:VideoDubbingStackVideoDubbingPollyJobs00FD9F22
+  PolyJobCompletedLambdaVideoDubbingPollyJobs6634B343:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint:
+        Fn::GetAtt:
+          - PolyJobCompletedLambdaAEBB5A1E
+          - Arn
+      Protocol: lambda
+      TopicArn:
+        Ref: VideoDubbingPollyJobsD6E6C2C7
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/PolyJobCompletedLambda/VideoDubbingPollyJobs/Resource
+  VideoDubbingEmail8BE6995A:
+    Type: AWS::SNS::Topic
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingEmail/Resource
+  VideoDubbingEmailTokenSubscription1B1D38C2D:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Endpoint:
+        Ref: snstopicemailparam
+      Protocol: email
+      TopicArn:
+        Ref: VideoDubbingEmail8BE6995A
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/VideoDubbingEmail/TokenSubscription:1/Resource
+  FFmpegLayer65FCD2A8:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.11
+      Content:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: e9d3ac6e04486a38d3bc9c11c8c1496d20d63a0379e6de211698f41b6deffe30.zip
+      Description: FFmpeg binary layer
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/FFmpegLayer/Resource
+      aws:asset:path: /Users/michshap/Documents/Code/GitHub/video-dubbing-git/lambda/ffmpeg/bin
+      aws:asset:is-bundled: false
+      aws:asset:property: Content
+  MergeAudioRoleC83AD2DD:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/MergeAudioRole/Resource
+  MergeAudioRoleDefaultPolicyD1089650:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - sqs:ChangeMessageVisibility
+              - sqs:DeleteMessage
+              - sqs:GetQueueAttributes
+              - sqs:GetQueueUrl
+              - sqs:ReceiveMessage
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - MergeAudio2D8ED7DE
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: MergeAudioRoleDefaultPolicyD1089650
+      Roles:
+        - Ref: MergeAudioRoleC83AD2DD
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/MergeAudioRole/DefaultPolicy/Resource
+  SqsGetDeleteMessagePolicy2BA1BDAF:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - sqs:DeleteMessage
+              - sqs:GetQueueUrl
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - SrtToPollyE9339DB3
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: SqsGetDeleteMessagePolicy2BA1BDAF
+      Roles:
+        - Ref: MergeAudioRoleC83AD2DD
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/SqsGetDeleteMessagePolicy/Resource
+  DynamoGetItemPolicy5E689006:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - dynamodb:GetItem
+              - dynamodb:Query
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - VideoDubbungPollyJobStatus67E8C401
+                  - Arn
+              - Fn::GetAtt:
+                  - VideoDubbungStatusBC5B51B6
+                  - Arn
+        Version: "2012-10-17"
+      PolicyName: DynamoGetItemPolicy5E689006
+      Roles:
+        - Ref: MergeAudioRoleC83AD2DD
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/DynamoGetItemPolicy/Resource
+  DynamoQueryIndexPolicyF3BB1650:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: dynamodb:Query
+            Effect: Allow
+            Resource:
+              Fn::Join:
+                - ""
+                - - Fn::GetAtt:
+                      - VideoDubbungPollyJobStatus67E8C401
+                      - Arn
+                  - /index/dubbing_job_id_index
+        Version: "2012-10-17"
+      PolicyName: DynamoQueryIndexPolicyF3BB1650
+      Roles:
+        - Ref: MergeAudioRoleC83AD2DD
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/DynamoQueryIndexPolicy/Resource
+  SnsEmailNotificationPolicy19E6B7CF:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: sns:Publish
+            Effect: Allow
+            Resource:
+              Ref: VideoDubbingEmail8BE6995A
+        Version: "2012-10-17"
+      PolicyName: SnsEmailNotificationPolicy19E6B7CF
+      Roles:
+        - Ref: MergeAudioRoleC83AD2DD
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/SnsEmailNotificationPolicy/Resource
+  S3GetSourceAssetPolicy27340AB4:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: s3:GetObject
+            Effect: Allow
+            Resource:
+              - Fn::GetAtt:
+                  - VideoDubbingFilesSource65A974C7
+                  - Arn
+              - Fn::Join:
+                  - ""
+                  - - Fn::GetAtt:
+                        - VideoDubbingFilesSource65A974C7
+                        - Arn
+                    - /*
+        Version: "2012-10-17"
+      PolicyName: S3GetSourceAssetPolicy27340AB4
+      Roles:
+        - Ref: MergeAudioRoleC83AD2DD
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/S3GetSourceAssetPolicy/Resource
+  MergeAudioLambda236640A9:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: 83d7b1540a3dfca3cbf0b1e05da61597a1fd5349b3f94b6f69a87fd7de4b49ba.zip
+      Environment:
+        Variables:
+          DYNAMO_DUBBING_STATUS_TABLE:
+            Ref: VideoDubbungStatusBC5B51B6
+          DYNAMO_POLLY_JOBS_TABLE:
+            Ref: VideoDubbungPollyJobStatus67E8C401
+          DYNAMO_POLLY_JOBS_INDEX: dubbing_job_id_index
+          SNS_EMAIL_TOPIC:
+            Ref: VideoDubbingEmail8BE6995A
+          FFMPEG_PATH: /var/task/bin/ffmpeg
+          EMAIL_ADDRESS:
+            Ref: snstopicemailparam
+      Handler: merge-audio.lambda_handler
+      Layers:
+        - Ref: FFmpegLayer65FCD2A8
+      MemorySize: 1024
+      Role:
+        Fn::GetAtt:
+          - MergeAudioRoleC83AD2DD
+          - Arn
+      Runtime: python3.11
+      Timeout: 900
+    DependsOn:
+      - MergeAudioRoleDefaultPolicyD1089650
+      - MergeAudioRoleC83AD2DD
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/MergeAudioLambda/Resource
+      aws:asset:path: /Users/michshap/Documents/Code/GitHub/video-dubbing-git/lambda/ffmpeg
+      aws:asset:is-bundled: false
+      aws:asset:property: Code
+  MergeAudioLambdaSqsEventSourceVideoDubbingStackMergeAudio17D9525762FF5914:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties:
+      EventSourceArn:
+        Fn::GetAtt:
+          - MergeAudio2D8ED7DE
+          - Arn
+      FunctionName:
+        Ref: MergeAudioLambda236640A9
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/MergeAudioLambda/SqsEventSource:VideoDubbingStackMergeAudio17D95257/Resource
+  ImageLayer8C2AB07F:
+    Type: AWS::Lambda::LayerVersion
+    Properties:
+      CompatibleRuntimes:
+        - python3.11
+      Content:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: 50b63b221f4c0e764163abda2fca472aab723a94a4273e492edff6c4900a6342.zip
+      Description: Image Layer
+      LayerName: ImageLayer
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/ImageLayer/Resource
+      aws:asset:path: /Users/michshap/Documents/Code/GitHub/video-dubbing-git/cdk.out/asset.50b63b221f4c0e764163abda2fca472aab723a94a4273e492edff6c4900a6342
+      aws:asset:is-bundled: true
+      aws:asset:property: Content
+  ImageAnalysisRoleEB85118A:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/ImageAnalysisRole/Resource
+  IdentifyGenderLambdaC3147987:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: 301ac77ba6456084ba22a73cd576073aeaaf51073440abac937101341363f15e.zip
+      Environment:
+        Variables:
+          DYNAMO_DUBBING_STATUS_TABLE:
+            Ref: VideoDubbungStatusBC5B51B6
+      Handler: identify-gender.lambda_handler
+      Layers:
+        - Ref: ImageLayer8C2AB07F
+      MemorySize: 1024
+      Role:
+        Fn::GetAtt:
+          - ImageAnalysisRoleEB85118A
+          - Arn
+      Runtime: python3.11
+      Timeout: 900
+    DependsOn:
+      - ImageAnalysisRoleEB85118A
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/IdentifyGenderLambda/Resource
+      aws:asset:path: /Users/michshap/Documents/Code/GitHub/video-dubbing-git/lambda/images
+      aws:asset:is-bundled: false
+      aws:asset:property: Code
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/22QzU7DMBCEn6V319AUcacVcAER2qrXauMsxcQ/wWsXRVHeHdspJUicdubz2uudgi9ubvn1DL5oLupmrmTF+60H0bCIDr0EzfuNVcjWbybX0iopumRHNTAFuqqB9w/BCC+tSWdTXaLTkii5+xMav7XBCXyGtpXmmBr+oU/Qodujo/MbUz8wWh6ACD3xu1Si5/0qiAb9CgjZKNO1sxrL78+nfmB1Z0DbOi6+g0rhvkgtj8pWoDIYGKYPUgwinIMIidJnRK8BQ2ZZRGgi3NlWigRHsQ0VCSfbn0CmfhjYBinvzvIyMfxjziWQt/pylqZO9CW9P12lsydZo8sppOTBgUaPLpmX4NuQU1lbU8s8nJWdf7fmaskXBS9mHyTl3AXjpUa+Ges39MaYAiICAAA=
+    Metadata:
+      aws:cdk:path: VideoDubbingStack/CDKMetadata/Default
+    Condition: CDKMetadataAvailable
+Mappings:
+  LatestNodeRuntimeMap:
+    af-south-1:
+      value: nodejs20.x
+    ap-east-1:
+      value: nodejs20.x
+    ap-northeast-1:
+      value: nodejs20.x
+    ap-northeast-2:
+      value: nodejs20.x
+    ap-northeast-3:
+      value: nodejs20.x
+    ap-south-1:
+      value: nodejs20.x
+    ap-south-2:
+      value: nodejs20.x
+    ap-southeast-1:
+      value: nodejs20.x
+    ap-southeast-2:
+      value: nodejs20.x
+    ap-southeast-3:
+      value: nodejs20.x
+    ap-southeast-4:
+      value: nodejs20.x
+    ca-central-1:
+      value: nodejs20.x
+    cn-north-1:
+      value: nodejs18.x
+    cn-northwest-1:
+      value: nodejs18.x
+    eu-central-1:
+      value: nodejs20.x
+    eu-central-2:
+      value: nodejs20.x
+    eu-north-1:
+      value: nodejs20.x
+    eu-south-1:
+      value: nodejs20.x
+    eu-south-2:
+      value: nodejs20.x
+    eu-west-1:
+      value: nodejs20.x
+    eu-west-2:
+      value: nodejs20.x
+    eu-west-3:
+      value: nodejs20.x
+    il-central-1:
+      value: nodejs20.x
+    me-central-1:
+      value: nodejs20.x
+    me-south-1:
+      value: nodejs20.x
+    sa-east-1:
+      value: nodejs20.x
+    us-east-1:
+      value: nodejs20.x
+    us-east-2:
+      value: nodejs20.x
+    us-west-1:
+      value: nodejs20.x
+    us-west-2:
+      value: nodejs20.x
+Parameters:
+  snstopicemailparam:
+    Type: String
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+Outputs:
+  UploadAudioFileToThisS3bucket:
+    Value:
+      Ref: VideoDubbingFilesSource65A974C7
+  Stagingfileslocatedhere:
+    Value:
+      Ref: VideoDubbingStagingCD98B579
+  StartTranscribeJobLambda:
+    Value:
+      Ref: lambdafunction45C982D3
+  PollyJobLambda:
+    Value:
+      Ref: VideoDubbingConvertSubsToPollyCA61E95F
+  ProcessTranscribeJobResultLambda:
+    Value:
+      Ref: VideoDubbingTranscribeEventCompleted8766254A
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - af-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - il-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-2
+Rules:
+  CheckBootstrapVersion:
+    Assertions:
+      - Assert:
+          Fn::Not:
+            - Fn::Contains:
+                - - "1"
+                  - "2"
+                  - "3"
+                  - "4"
+                  - "5"
+                - Ref: BootstrapVersion
+        AssertDescription: CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.
+

@@ -17,7 +17,7 @@
                 "path": "VideoDubbingStack/TranscribeForDubbingLambdaRole/ImportTranscribeForDubbingLambdaRole",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.Resource",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Resource": {
@@ -56,7 +56,7 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnRole",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "DefaultPolicy": {
@@ -110,19 +110,19 @@
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.Policy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Role",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "lambda_function": {
@@ -138,7 +138,7 @@
                     "path": "VideoDubbingStack/lambda_function/Code/Stage",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.AssetStaging",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   },
                   "AssetBucket": {
@@ -146,13 +146,13 @@
                     "path": "VideoDubbingStack/lambda_function/Code/AssetBucket",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_s3.BucketBase",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Resource": {
@@ -165,7 +165,7 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                       },
-                      "s3Key": "166365b387786ac1b4349fcb5df3108e8f64ac9bc6470b08afba006fba44cded.zip"
+                      "s3Key": "89c090c59a25925aa6e37682fd7a823b4a36013a64ca3a40e21ea7038f4ccb11.zip"
                     },
                     "environment": {
                       "variables": {
@@ -186,13 +186,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_lambda.Function",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "VideoDubbingFilesSource": {
@@ -215,7 +215,7 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_s3.CfnBucket",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Policy": {
@@ -279,13 +279,13 @@
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_s3.CfnBucketPolicy",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_s3.BucketPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "AutoDeleteObjectsCustomResource": {
@@ -297,13 +297,13 @@
                     "path": "VideoDubbingStack/VideoDubbingFilesSource/AutoDeleteObjectsCustomResource/Default",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.CfnResource",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.CustomResource",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Notifications": {
@@ -315,7 +315,7 @@
                     "path": "VideoDubbingStack/VideoDubbingFilesSource/Notifications/Resource",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.CfnResource",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
@@ -351,13 +351,21 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_s3.Bucket",
-              "version": "2.133.0"
+              "version": "2.146.0"
+            }
+          },
+          "LatestNodeRuntimeMap": {
+            "id": "LatestNodeRuntimeMap",
+            "path": "VideoDubbingStack/LatestNodeRuntimeMap",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnMapping",
+              "version": "2.146.0"
             }
           },
           "Custom::S3AutoDeleteObjectsCustomResourceProvider": {
@@ -369,7 +377,7 @@
                 "path": "VideoDubbingStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Staging",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.AssetStaging",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Role": {
@@ -377,7 +385,7 @@
                 "path": "VideoDubbingStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.CfnResource",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Handler": {
@@ -385,13 +393,13 @@
                 "path": "VideoDubbingStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.CfnResource",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.CustomResourceProviderBase",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "VideoDubbingStaging": {
@@ -414,7 +422,7 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_s3.CfnBucket",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Policy": {
@@ -478,13 +486,13 @@
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_s3.CfnBucketPolicy",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_s3.BucketPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "AutoDeleteObjectsCustomResource": {
@@ -496,19 +504,19 @@
                     "path": "VideoDubbingStack/VideoDubbingStaging/AutoDeleteObjectsCustomResource/Default",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.CfnResource",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.CustomResource",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_s3.Bucket",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "BucketNotificationsHandler050a0587b7544547bf325f094a3db834": {
@@ -524,7 +532,7 @@
                     "path": "VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/ImportRole",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.Resource",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   },
                   "Resource": {
@@ -563,7 +571,7 @@
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_iam.CfnRole",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   },
                   "DefaultPolicy": {
@@ -596,19 +604,19 @@
                         },
                         "constructInfo": {
                           "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                          "version": "2.133.0"
+                          "version": "2.146.0"
                         }
                       }
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_iam.Policy",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.Role",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Resource": {
@@ -616,7 +624,7 @@
                 "path": "VideoDubbingStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Resource",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.CfnResource",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
@@ -659,13 +667,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_dynamodb.CfnGlobalTable",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_dynamodb.TableV2",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "VideoDubbungPollyJobStatus": {
@@ -725,13 +733,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_dynamodb.CfnGlobalTable",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_dynamodb.TableV2",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "VideoDubbingTranscribeEvent": {
@@ -771,7 +779,7 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_events.CfnRule",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "AllowEventRuleVideoDubbingStackVideoDubbingTranscribeEventCompletedE2CA3183": {
@@ -798,13 +806,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_events.Rule",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "SummarizeLambdaRole": {
@@ -816,7 +824,7 @@
                 "path": "VideoDubbingStack/SummarizeLambdaRole/ImportSummarizeLambdaRole",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.Resource",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Resource": {
@@ -855,13 +863,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnRole",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Role",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "S3CopySourcePolicy": {
@@ -918,13 +926,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "S3CopyTargetPolicy": {
@@ -981,19 +989,22 @@
                       },
                       {
                         "Ref": "MergeAudioRoleC83AD2DD"
+                      },
+                      {
+                        "Ref": "ImageAnalysisRoleEB85118A"
                       }
                     ]
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "TranslateTextPolicy": {
@@ -1009,7 +1020,10 @@
                     "policyDocument": {
                       "Statement": [
                         {
-                          "Action": "translate:TranslateText",
+                          "Action": [
+                            "translate:ListLanguages",
+                            "translate:TranslateText"
+                          ],
                           "Effect": "Allow",
                           "Resource": "*"
                         }
@@ -1026,13 +1040,52 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
+            }
+          },
+          "DescribeVoicesPolicy": {
+            "id": "DescribeVoicesPolicy",
+            "path": "VideoDubbingStack/DescribeVoicesPolicy",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/DescribeVoicesPolicy/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "polly:DescribeVoices",
+                          "Effect": "Allow",
+                          "Resource": "*"
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "DescribeVoicesPolicyFF4A57CF",
+                    "roles": [
+                      {
+                        "Ref": "SummarizeLambdaRole4DE425CC"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.146.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.146.0"
             }
           },
           "VideoDubbingDLQ": {
@@ -1050,13 +1103,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_sqs.CfnQueue",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_sqs.Queue",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "SrtToPolly": {
@@ -1084,13 +1137,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_sqs.CfnQueue",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_sqs.Queue",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "SqsPutMessagePolicy": {
@@ -1131,13 +1184,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "getTranscribeJobPolicy": {
@@ -1170,13 +1223,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "VideoDubbingTranscribeEventCompleted": {
@@ -1192,7 +1245,7 @@
                     "path": "VideoDubbingStack/VideoDubbingTranscribeEventCompleted/Code/Stage",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.AssetStaging",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   },
                   "AssetBucket": {
@@ -1200,13 +1253,13 @@
                     "path": "VideoDubbingStack/VideoDubbingTranscribeEventCompleted/Code/AssetBucket",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_s3.BucketBase",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Resource": {
@@ -1219,7 +1272,7 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                       },
-                      "s3Key": "166365b387786ac1b4349fcb5df3108e8f64ac9bc6470b08afba006fba44cded.zip"
+                      "s3Key": "89c090c59a25925aa6e37682fd7a823b4a36013a64ca3a40e21ea7038f4ccb11.zip"
                     },
                     "environment": {
                       "variables": {
@@ -1250,13 +1303,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_lambda.Function",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "VideoDubbingPollyJobs": {
@@ -1272,13 +1325,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_sns.CfnTopic",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_sns.Topic",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "ConvertSubtitlesToPollyLambdaRole": {
@@ -1290,7 +1343,7 @@
                 "path": "VideoDubbingStack/ConvertSubtitlesToPollyLambdaRole/ImportConvertSubtitlesToPollyLambdaRole",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.Resource",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Resource": {
@@ -1329,7 +1382,7 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnRole",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "DefaultPolicy": {
@@ -1373,19 +1426,19 @@
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.Policy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Role",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "SqsGetMessagePolicy": {
@@ -1443,13 +1496,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "PollyStartSpeechSynthesisTaskPolicy": {
@@ -1482,13 +1535,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "DynamoPutItemPolicy": {
@@ -1534,13 +1587,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "SnsPollyJobNotificationPolicy": {
@@ -1575,13 +1628,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "VideoDubbingConvertSubsToPolly": {
@@ -1597,7 +1650,7 @@
                     "path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly/Code/Stage",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.AssetStaging",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   },
                   "AssetBucket": {
@@ -1605,13 +1658,13 @@
                     "path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly/Code/AssetBucket",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_s3.BucketBase",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Resource": {
@@ -1624,7 +1677,7 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                       },
-                      "s3Key": "d2ba87f6cb07d612920b2ab67c6ff83b43a539b2dd915d37b4f8ad8b9293df18.zip"
+                      "s3Key": "79d03acfe04ac54f347a785f404b93da57f19489097516045d50a07bfd523418.zip"
                     },
                     "environment": {
                       "variables": {
@@ -1638,7 +1691,6 @@
                           "Ref": "VideoDubbingStagingCD98B579"
                         },
                         "POLLY_LANGUAGE_CODE": "ru-RU",
-                        "POLLY_VOICE_ID": "Tatyana",
                         "POLLY_JOBS_SNS_ARN": {
                           "Ref": "VideoDubbingPollyJobsD6E6C2C7"
                         }
@@ -1658,7 +1710,7 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "SqsEventSource:VideoDubbingStackSrtToPollyF5A9260D": {
@@ -1684,19 +1736,19 @@
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_lambda.CfnEventSourceMapping",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_lambda.EventSourceMapping",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_lambda.Function",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "MergeAudio": {
@@ -1719,18 +1771,18 @@
                       },
                       "maxReceiveCount": 5
                     },
-                    "visibilityTimeout": 120
+                    "visibilityTimeout": 950
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_sqs.CfnQueue",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_sqs.Queue",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "PolyJobCompletedRole": {
@@ -1742,7 +1794,7 @@
                 "path": "VideoDubbingStack/PolyJobCompletedRole/ImportPolyJobCompletedRole",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.Resource",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Resource": {
@@ -1781,13 +1833,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnRole",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Role",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "DynamoPutGetItemPolicy": {
@@ -1837,13 +1889,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "SnsPollyJobCompletedNotificationPolicy": {
@@ -1881,13 +1933,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "SqsSendMessagePolicy": {
@@ -1905,13 +1957,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "PolyJobCompletedLambda": {
@@ -1927,7 +1979,7 @@
                     "path": "VideoDubbingStack/PolyJobCompletedLambda/Code/Stage",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.AssetStaging",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   },
                   "AssetBucket": {
@@ -1935,13 +1987,13 @@
                     "path": "VideoDubbingStack/PolyJobCompletedLambda/Code/AssetBucket",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_s3.BucketBase",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Resource": {
@@ -1954,7 +2006,7 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                       },
-                      "s3Key": "d2ba87f6cb07d612920b2ab67c6ff83b43a539b2dd915d37b4f8ad8b9293df18.zip"
+                      "s3Key": "79d03acfe04ac54f347a785f404b93da57f19489097516045d50a07bfd523418.zip"
                     },
                     "environment": {
                       "variables": {
@@ -1986,7 +2038,7 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "AllowInvoke:VideoDubbingStackVideoDubbingPollyJobs00FD9F22": {
@@ -2010,7 +2062,7 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "VideoDubbingPollyJobs": {
@@ -2037,19 +2089,19 @@
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_sns.CfnSubscription",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_sns.Subscription",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_lambda.Function",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "VideoDubbingEmail": {
@@ -2065,7 +2117,7 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_sns.CfnTopic",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "TokenSubscription:1": {
@@ -2089,19 +2141,19 @@
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_sns.CfnSubscription",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_sns.Subscription",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_sns.Topic",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "sns-topic-email-param": {
@@ -2109,7 +2161,7 @@
             "path": "VideoDubbingStack/sns-topic-email-param",
             "constructInfo": {
               "fqn": "aws-cdk-lib.CfnParameter",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "FFmpegLayer": {
@@ -2125,7 +2177,7 @@
                     "path": "VideoDubbingStack/FFmpegLayer/Code/Stage",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.AssetStaging",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   },
                   "AssetBucket": {
@@ -2133,13 +2185,13 @@
                     "path": "VideoDubbingStack/FFmpegLayer/Code/AssetBucket",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_s3.BucketBase",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Resource": {
@@ -2162,13 +2214,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_lambda.CfnLayerVersion",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_lambda.LayerVersion",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "MergeAudioRole": {
@@ -2180,7 +2232,7 @@
                 "path": "VideoDubbingStack/MergeAudioRole/ImportMergeAudioRole",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.Resource",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Resource": {
@@ -2219,7 +2271,7 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnRole",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "DefaultPolicy": {
@@ -2263,19 +2315,19 @@
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.Policy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Role",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "SqsGetDeleteMessagePolicy": {
@@ -2316,13 +2368,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "DynamoGetItemPolicy": {
@@ -2371,13 +2423,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "DynamoQueryIndexPolicy": {
@@ -2423,13 +2475,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "SnsEmailNotificationPolicy": {
@@ -2464,13 +2516,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "S3GetSourceAssetPolicy": {
@@ -2524,13 +2576,13 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_iam.Policy",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "MergeAudioLambda": {
@@ -2546,7 +2598,7 @@
                     "path": "VideoDubbingStack/MergeAudioLambda/Code/Stage",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.AssetStaging",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   },
                   "AssetBucket": {
@@ -2554,13 +2606,13 @@
                     "path": "VideoDubbingStack/MergeAudioLambda/Code/AssetBucket",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_s3.BucketBase",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Resource": {
@@ -2573,7 +2625,7 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                       },
-                      "s3Key": "a47c239c4b1ed2d3ff6a312eb5dcb01714b7e8ddae015d4a547be0b267261540.zip"
+                      "s3Key": "86ef67a36378b0114bc36f0551b2c6e68b1ea0db7c9ba10328c848d6bed82d77.zip"
                     },
                     "environment": {
                       "variables": {
@@ -2587,7 +2639,10 @@
                         "SNS_EMAIL_TOPIC": {
                           "Ref": "VideoDubbingEmail8BE6995A"
                         },
-                        "FFMPEG_PATH": "/var/task/bin/ffmpeg"
+                        "FFMPEG_PATH": "/var/task/bin/ffmpeg",
+                        "EMAIL_ADDRESS": {
+                          "Ref": "snstopicemailparam"
+                        }
                       }
                     },
                     "handler": "merge-audio.lambda_handler",
@@ -2609,7 +2664,7 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "SqsEventSource:VideoDubbingStackMergeAudio17D95257": {
@@ -2635,19 +2690,230 @@
                     },
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_lambda.CfnEventSourceMapping",
-                      "version": "2.133.0"
+                      "version": "2.146.0"
                     }
                   }
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_lambda.EventSourceMapping",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
             "constructInfo": {
               "fqn": "aws-cdk-lib.aws_lambda.Function",
-              "version": "2.133.0"
+              "version": "2.146.0"
+            }
+          },
+          "ImageAnalysisRole": {
+            "id": "ImageAnalysisRole",
+            "path": "VideoDubbingStack/ImageAnalysisRole",
+            "children": {
+              "ImportImageAnalysisRole": {
+                "id": "ImportImageAnalysisRole",
+                "path": "VideoDubbingStack/ImageAnalysisRole/ImportImageAnalysisRole",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.146.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/ImageAnalysisRole/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "managedPolicyArns": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                          ]
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                  "version": "2.146.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Role",
+              "version": "2.146.0"
+            }
+          },
+          "IdentifyGenderLambda": {
+            "id": "IdentifyGenderLambda",
+            "path": "VideoDubbingStack/IdentifyGenderLambda",
+            "children": {
+              "Code": {
+                "id": "Code",
+                "path": "VideoDubbingStack/IdentifyGenderLambda/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "VideoDubbingStack/IdentifyGenderLambda/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.146.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "VideoDubbingStack/IdentifyGenderLambda/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.146.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.146.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/IdentifyGenderLambda/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": {
+                        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+                      },
+                      "s3Key": "8e41564fffda483776e2749ce5f58f203704f683d8d4a30d9ee8520c4c961e2b.zip"
+                    },
+                    "environment": {
+                      "variables": {
+                        "FFMPEG_PATH": "/opt/ffmpeg"
+                      }
+                    },
+                    "handler": "identify-gender.lambda_handler",
+                    "layers": [
+                      {
+                        "Ref": "FFmpegLayer65FCD2A8"
+                      }
+                    ],
+                    "memorySize": 1024,
+                    "role": {
+                      "Fn::GetAtt": [
+                        "ImageAnalysisRoleEB85118A",
+                        "Arn"
+                      ]
+                    },
+                    "runtime": "python3.11",
+                    "timeout": 900
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.146.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.146.0"
+            }
+          },
+          "InvokeBedrock": {
+            "id": "InvokeBedrock",
+            "path": "VideoDubbingStack/InvokeBedrock",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/InvokeBedrock/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "bedrock:InvokeModel",
+                          "Effect": "Allow",
+                          "Resource": {
+                            "Fn::GetAtt": [
+                              "IdentifyGenderLambdaC3147987",
+                              "Arn"
+                            ]
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "InvokeBedrockA334D07D"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.146.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.146.0"
+            }
+          },
+          "Upload Audio File To This S3 bucket": {
+            "id": "Upload Audio File To This S3 bucket",
+            "path": "VideoDubbingStack/Upload Audio File To This S3 bucket",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.146.0"
+            }
+          },
+          "Staging files located here": {
+            "id": "Staging files located here",
+            "path": "VideoDubbingStack/Staging files located here",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.146.0"
+            }
+          },
+          "Start Transcribe Job Lambda": {
+            "id": "Start Transcribe Job Lambda",
+            "path": "VideoDubbingStack/Start Transcribe Job Lambda",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.146.0"
+            }
+          },
+          "Polly Job Lambda": {
+            "id": "Polly Job Lambda",
+            "path": "VideoDubbingStack/Polly Job Lambda",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.146.0"
+            }
+          },
+          "Process Transcribe Job Result Lambda": {
+            "id": "Process Transcribe Job Result Lambda",
+            "path": "VideoDubbingStack/Process Transcribe Job Result Lambda",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.146.0"
             }
           },
           "CDKMetadata": {
@@ -2659,7 +2925,7 @@
                 "path": "VideoDubbingStack/CDKMetadata/Default",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.CfnResource",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               },
               "Condition": {
@@ -2667,7 +2933,7 @@
                 "path": "VideoDubbingStack/CDKMetadata/Condition",
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.CfnCondition",
-                  "version": "2.133.0"
+                  "version": "2.146.0"
                 }
               }
             },
@@ -2681,7 +2947,7 @@
             "path": "VideoDubbingStack/BootstrapVersion",
             "constructInfo": {
               "fqn": "aws-cdk-lib.CfnParameter",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           },
           "CheckBootstrapVersion": {
@@ -2689,13 +2955,13 @@
             "path": "VideoDubbingStack/CheckBootstrapVersion",
             "constructInfo": {
               "fqn": "aws-cdk-lib.CfnRule",
-              "version": "2.133.0"
+              "version": "2.146.0"
             }
           }
         },
         "constructInfo": {
           "fqn": "aws-cdk-lib.Stack",
-          "version": "2.133.0"
+          "version": "2.146.0"
         }
       },
       "Tree": {
@@ -2709,7 +2975,7 @@
     },
     "constructInfo": {
       "fqn": "aws-cdk-lib.App",
-      "version": "2.133.0"
+      "version": "2.146.0"
     }
   }
 }
