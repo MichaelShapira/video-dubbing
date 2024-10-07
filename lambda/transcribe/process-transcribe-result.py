@@ -12,6 +12,7 @@ s3_client = boto3.client('s3')
 sqs = boto3.client('sqs')
 translate = boto3.client('translate')
 polly = boto3.client('polly')
+lambda_client = boto3.client('lambda')
 
 def translate_text(text):
     
@@ -50,7 +51,11 @@ def get_speaker_label_in_time_range(json_data, start_time_ms, end_time_ms):
     
     return None    
     
-def parse_srt(srt_content,metadata_json,num_of_speakers,polly_voices):
+def parse_srt(srt_content,
+              metadata_json,
+              num_of_speakers,
+              polly_voices,
+              video_file):
     srt_pattern = re.compile(r'(\d+)\n(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})\n(.*?)(?=\n\d+\n|\Z)', re.DOTALL)
     matches = srt_pattern.findall(srt_content)
     
@@ -67,10 +72,10 @@ def parse_srt(srt_content,metadata_json,num_of_speakers,polly_voices):
         
         speaker_id =get_speaker_label_in_time_range(metadata_json,start_ms,end_ms)\
         
-        if speaker_id==None:
+        if speaker_id is None:
             speaker_id='spk_0'
             
-
+        
         
         speaker_id_index = int(speaker_id[-1])
         
@@ -92,6 +97,26 @@ def parse_srt(srt_content,metadata_json,num_of_speakers,polly_voices):
         }
         
         subtitles.append(subtitle)
+
+
+    payload = {
+        "srt": subtitles,
+        "num_of_speakers":num_of_speakers,
+        "video_file":video_file
+    }
+
+    # Invoke Lambda A synchronously
+    lambda_response = lambda_client.invoke(
+        FunctionName='VideoDubbingIdentifyGender',  # Replace with the actual name of Lambda A
+        InvocationType='RequestResponse',  # Synchronous invocation
+        Payload=json.dumps(payload)
+    )
+
+    # Read the response from Lambda A
+    response_payload = json.loads(lambda_response['Payload'].read().decode('utf-8'))
+    
+    # Print the output
+    print(f"Response from Lambda A: {response_payload}") 
     
     return subtitles
 
@@ -229,7 +254,7 @@ def lambda_handler(event, context):
     new_json = shrink_metadata_file(metadata_srt_content)
 
     num_of_speakers = new_json['speaker_labels']['speakers']
-    subtitles = parse_srt(srt_content,new_json,num_of_speakers,polly_voices)
+    subtitles = parse_srt(srt_content,new_json,num_of_speakers,polly_voices,video_file)
     
 
 

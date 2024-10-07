@@ -34,10 +34,13 @@ class VideoDubbingStack(Stack):
         transcribeLambdaRole = iam.Role(self, "TranscribeForDubbingLambdaRole",
                      assumed_by=iam.ServicePrincipal("lambda.amazonaws.com")
                                     )
+        transcribeLambdaRole.apply_removal_policy(RemovalPolicy.DESTROY)
+
         transcribeLambdaRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
  
-        functionAudionToText = _lambda.Function(self, "lambda_function",
+        functionAudionToText = _lambda.Function(self, "VideoDubbingStartTranscriptionLambda",
                                     runtime=_lambda.Runtime.PYTHON_3_11,
+                                    function_name='VideoDubbingStartTranscribtion',
                                     handler="video-dubbing-start-transcribe.lambda_handler",
                                     code=_lambda.Code.from_asset("./lambda/transcribe"),
                                     timeout=cdk.Duration.seconds(30),
@@ -64,7 +67,8 @@ class VideoDubbingStack(Stack):
         transcribeLambdaRole.add_to_policy(iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
                 resources=["*"],
-                actions=["transcribe:StartTranscriptionJob"]
+                actions=["transcribe:StartTranscriptionJob","transcribe:TagResource"],
+                
                 
             ))
 
@@ -72,6 +76,7 @@ class VideoDubbingStack(Stack):
                 effect=iam.Effect.ALLOW,
                 resources=[sourceBucket.bucket_arn+"/*"],
                 actions=["s3:PutObject","s3:GetObject"]
+                
                 
             ))   
 
@@ -110,8 +115,10 @@ class VideoDubbingStack(Stack):
         # Permissions for processTransactionResultLambda
         processTransactionResultLambdaRole = iam.Role(self, "SummarizeLambdaRole",
                      assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"))
-        processTransactionResultLambdaRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
+        processTransactionResultLambdaRole.apply_removal_policy(RemovalPolicy.DESTROY)
 
+        processTransactionResultLambdaRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
+    
         s3CopySourcePolicy = iam.Policy(self, "S3CopySourcePolicy")  
         s3CopySourcePolicy.add_statements(PolicyStatement(
             effect=iam.Effect.ALLOW,
@@ -178,12 +185,13 @@ class VideoDubbingStack(Stack):
             resources=["*"]
         )) 
         processTransactionResultLambdaRole.attach_inline_policy(getTranscribeJobPolicy)
-    
-     
+
+       
                                                                    
         # Lambda that is called when EventBridge identifies that Transcribe Job is over
         processTransactionResultLambda = _lambda.Function(self, "VideoDubbingTranscribeEventCompleted",
                                     runtime=_lambda.Runtime.PYTHON_3_11,
+                                    function_name='VideoDubbingTranscribeEventCompleted',
                                     handler="process-transcribe-result.lambda_handler",
                                     code=_lambda.Code.from_asset("./lambda/transcribe"),
                                     timeout=cdk.Duration.seconds(60),
@@ -202,6 +210,9 @@ class VideoDubbingStack(Stack):
 
         convertSubtitlesToPollyLambdaRole = iam.Role(self, "ConvertSubtitlesToPollyLambdaRole",
                      assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"))
+
+        convertSubtitlesToPollyLambdaRole.apply_removal_policy(RemovalPolicy.DESTROY)
+
         convertSubtitlesToPollyLambdaRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
 
 
@@ -243,6 +254,7 @@ class VideoDubbingStack(Stack):
         convertSubtitlesToPollyLambda = _lambda.Function(self, "VideoDubbingConvertSubsToPolly",
                                     runtime=_lambda.Runtime.PYTHON_3_11,
                                     handler="srt-to-polly.lambda_handler",
+                                    function_name='VideoDubbingConvertSubsToPolly',
                                     code=_lambda.Code.from_asset("./lambda/polly"),
                                     timeout=cdk.Duration.seconds(60),
                                     memory_size=512,
@@ -254,6 +266,7 @@ class VideoDubbingStack(Stack):
                                                 "POLLY_LANGUAGE_CODE": "ru-RU",
                                                 "POLLY_JOBS_SNS_ARN":sns_topic.topic_arn
                                             },
+                                            
                                     )
 
 
@@ -274,6 +287,9 @@ class VideoDubbingStack(Stack):
 
         polyJobCompletedRole = iam.Role(self, "PolyJobCompletedRole",
                      assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"))
+
+        polyJobCompletedRole.apply_removal_policy(RemovalPolicy.DESTROY)        
+
         polyJobCompletedRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
 
         dynamoPutGetItemPolicy = iam.Policy(self, "DynamoPutGetItemPolicy") 
@@ -305,6 +321,7 @@ class VideoDubbingStack(Stack):
         # Lambda that is called when Amazon Polly job completed
         polyJobCompletedLambda = _lambda.Function(self, "PolyJobCompletedLambda",
                                     runtime=_lambda.Runtime.PYTHON_3_11,
+                                    function_name='VideoDubbingPolyJobCompleted',
                                     handler="process-polly-task-result.lambda_handler",
                                     code=_lambda.Code.from_asset("./lambda/polly"),
                                     timeout=cdk.Duration.seconds(60),
@@ -384,6 +401,7 @@ class VideoDubbingStack(Stack):
         # Lambda that is called when Amazon Polly job completed
         mergeAudioLambda = _lambda.Function(self, "MergeAudioLambda",
                                     runtime=_lambda.Runtime.PYTHON_3_11,
+                                    function_name='VideoDubbingMergeAudio',
                                     handler="merge-audio.lambda_handler",
                                     code=_lambda.Code.from_asset("./lambda/ffmpeg"),
                                     timeout=cdk.Duration.seconds(900),
@@ -410,6 +428,8 @@ class VideoDubbingStack(Stack):
 
         imageAnalysisRole = iam.Role(self, "ImageAnalysisRole",
                                     assumed_by=iam.ServicePrincipal("lambda.amazonaws.com"))
+        imageAnalysisRole.apply_removal_policy(RemovalPolicy.DESTROY)    
+
         imageAnalysisRole.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AWSLambdaBasicExecutionRole"))
         # read mp3 and put merged content
         imageAnalysisRole.attach_inline_policy(s3CopyTargetPolicy)
@@ -419,6 +439,7 @@ class VideoDubbingStack(Stack):
         # Lambda that is called when Amazon Polly job completed
         identifyGenderLambda = _lambda.Function(self, "IdentifyGenderLambda",
                                     runtime=_lambda.Runtime.PYTHON_3_11,
+                                    function_name='VideoDubbingIdentifyGender',
                                     handler="identify-gender.lambda_handler",
                                     #code=_lambda.Code.from_asset("./lambda/images"),
                                     code= _lambda.Code.from_asset("./lambda/images"), 
@@ -430,12 +451,39 @@ class VideoDubbingStack(Stack):
                                                 },
                                      layers=[ffmpeg_layer]          
                                     ) 
+
+        
+        invokeLambdaPolicy = iam.Policy(self, "invokeLambdaPolicy")  
+        invokeLambdaPolicy.add_statements(PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["lambda:InvokeFunction"],
+            resources=[identifyGenderLambda.function_arn]
+        ))
+
+        processTransactionResultLambdaRole.attach_inline_policy(invokeLambdaPolicy)
+
+        imageAnalysisRole.add_to_policy(iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                resources=[sourceBucket.bucket_arn+"/*"],
+                actions=["s3:GetObject"]
+        ))
+
+
         invokeBedrockRole = iam.Policy(self, "InvokeBedrock") 
         invokeBedrockRole.add_statements(PolicyStatement(
                     effect=iam.Effect.ALLOW,
                     actions=["bedrock:InvokeModel"],
                     resources=[identifyGenderLambda.function_arn]
-                ))                            
+                ))  
+        imageAnalysisRole.attach_inline_policy(invokeBedrockRole)        
+
+        invokeLambdaRole = iam.Policy(self, "AllowInvocationFromLambda") 
+        invokeLambdaRole.add_statements(PolicyStatement(
+                    effect=iam.Effect.ALLOW,
+                    actions=["lambda:InvokeFunction"],
+                    resources=["*"]
+                ))  
+        processTransactionResultLambdaRole.attach_inline_policy(invokeLambdaRole)                                         
 
         CfnOutput(self, "Upload Audio File To This S3 bucket", value=sourceBucket.bucket_name)
         CfnOutput(self, "Staging files located here", value=stagingBucket.bucket_name)

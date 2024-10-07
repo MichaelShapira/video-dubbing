@@ -72,7 +72,10 @@
                         "policyDocument": {
                           "Statement": [
                             {
-                              "Action": "transcribe:StartTranscriptionJob",
+                              "Action": [
+                                "transcribe:StartTranscriptionJob",
+                                "transcribe:TagResource"
+                              ],
                               "Effect": "Allow",
                               "Resource": "*"
                             },
@@ -125,17 +128,17 @@
               "version": "2.146.0"
             }
           },
-          "lambda_function": {
-            "id": "lambda_function",
-            "path": "VideoDubbingStack/lambda_function",
+          "VideoDubbingStartTranscriptionLambda": {
+            "id": "VideoDubbingStartTranscriptionLambda",
+            "path": "VideoDubbingStack/VideoDubbingStartTranscriptionLambda",
             "children": {
               "Code": {
                 "id": "Code",
-                "path": "VideoDubbingStack/lambda_function/Code",
+                "path": "VideoDubbingStack/VideoDubbingStartTranscriptionLambda/Code",
                 "children": {
                   "Stage": {
                     "id": "Stage",
-                    "path": "VideoDubbingStack/lambda_function/Code/Stage",
+                    "path": "VideoDubbingStack/VideoDubbingStartTranscriptionLambda/Code/Stage",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.AssetStaging",
                       "version": "2.146.0"
@@ -143,7 +146,7 @@
                   },
                   "AssetBucket": {
                     "id": "AssetBucket",
-                    "path": "VideoDubbingStack/lambda_function/Code/AssetBucket",
+                    "path": "VideoDubbingStack/VideoDubbingStartTranscriptionLambda/Code/AssetBucket",
                     "constructInfo": {
                       "fqn": "aws-cdk-lib.aws_s3.BucketBase",
                       "version": "2.146.0"
@@ -157,7 +160,7 @@
               },
               "Resource": {
                 "id": "Resource",
-                "path": "VideoDubbingStack/lambda_function/Resource",
+                "path": "VideoDubbingStack/VideoDubbingStartTranscriptionLambda/Resource",
                 "attributes": {
                   "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
                   "aws:cdk:cloudformation:props": {
@@ -165,13 +168,14 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                       },
-                      "s3Key": "5556eba4940d11aa04895bffe0d70a2566d98edf807505e123e17aa38fd5048b.zip"
+                      "s3Key": "d485cfb8303916bb427d7cef174138ddec81e8c53ad45da28ca897499647e965.zip"
                     },
                     "environment": {
                       "variables": {
                         "AUDIO_LANGUAGE": "en-US"
                       }
                     },
+                    "functionName": "VideoDubbingStartTranscribtion",
                     "handler": "video-dubbing-start-transcribe.lambda_handler",
                     "memorySize": 256,
                     "role": {
@@ -324,16 +328,16 @@
                   "version": "10.3.0"
                 }
               },
-              "AllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB": {
-                "id": "AllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB",
-                "path": "VideoDubbingStack/VideoDubbingFilesSource/AllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB",
+              "AllowBucketNotificationsToVideoDubbingStackVideoDubbingStartTranscriptionLambda28C1D38A": {
+                "id": "AllowBucketNotificationsToVideoDubbingStackVideoDubbingStartTranscriptionLambda28C1D38A",
+                "path": "VideoDubbingStack/VideoDubbingFilesSource/AllowBucketNotificationsToVideoDubbingStackVideoDubbingStartTranscriptionLambda28C1D38A",
                 "attributes": {
                   "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
                   "aws:cdk:cloudformation:props": {
                     "action": "lambda:InvokeFunction",
                     "functionName": {
                       "Fn::GetAtt": [
-                        "lambdafunction45C982D3",
+                        "VideoDubbingStartTranscriptionLambdaB6770383",
                         "Arn"
                       ]
                     },
@@ -1272,7 +1276,7 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                       },
-                      "s3Key": "5556eba4940d11aa04895bffe0d70a2566d98edf807505e123e17aa38fd5048b.zip"
+                      "s3Key": "d485cfb8303916bb427d7cef174138ddec81e8c53ad45da28ca897499647e965.zip"
                     },
                     "environment": {
                       "variables": {
@@ -1289,6 +1293,7 @@
                         }
                       }
                     },
+                    "functionName": "VideoDubbingTranscribeEventCompleted",
                     "handler": "process-transcribe-result.lambda_handler",
                     "memorySize": 512,
                     "role": {
@@ -1696,6 +1701,7 @@
                         }
                       }
                     },
+                    "functionName": "VideoDubbingConvertSubsToPolly",
                     "handler": "srt-to-polly.lambda_handler",
                     "memorySize": 512,
                     "role": {
@@ -2024,6 +2030,7 @@
                         }
                       }
                     },
+                    "functionName": "VideoDubbingPolyJobCompleted",
                     "handler": "process-polly-task-result.lambda_handler",
                     "memorySize": 128,
                     "role": {
@@ -2645,6 +2652,7 @@
                         }
                       }
                     },
+                    "functionName": "VideoDubbingMergeAudio",
                     "handler": "merge-audio.lambda_handler",
                     "layers": [
                       {
@@ -2755,6 +2763,58 @@
                   "fqn": "aws-cdk-lib.aws_iam.CfnRole",
                   "version": "2.146.0"
                 }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "VideoDubbingStack/ImageAnalysisRole/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "VideoDubbingStack/ImageAnalysisRole/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "s3:GetObject",
+                              "Effect": "Allow",
+                              "Resource": {
+                                "Fn::Join": [
+                                  "",
+                                  [
+                                    {
+                                      "Fn::GetAtt": [
+                                        "VideoDubbingFilesSource65A974C7",
+                                        "Arn"
+                                      ]
+                                    },
+                                    "/*"
+                                  ]
+                                ]
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "ImageAnalysisRoleDefaultPolicy9FF43BAE",
+                        "roles": [
+                          {
+                            "Ref": "ImageAnalysisRoleEB85118A"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                      "version": "2.146.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Policy",
+                  "version": "2.146.0"
+                }
               }
             },
             "constructInfo": {
@@ -2802,13 +2862,14 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                       },
-                      "s3Key": "8e41564fffda483776e2749ce5f58f203704f683d8d4a30d9ee8520c4c961e2b.zip"
+                      "s3Key": "af2831079982e6959e776b4781b3c94f2253f8b9652460155def39b2a581ae24.zip"
                     },
                     "environment": {
                       "variables": {
                         "FFMPEG_PATH": "/opt/ffmpeg"
                       }
                     },
+                    "functionName": "VideoDubbingIdentifyGender",
                     "handler": "identify-gender.lambda_handler",
                     "layers": [
                       {
@@ -2837,6 +2898,50 @@
               "version": "2.146.0"
             }
           },
+          "invokeLambdaPolicy": {
+            "id": "invokeLambdaPolicy",
+            "path": "VideoDubbingStack/invokeLambdaPolicy",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/invokeLambdaPolicy/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "lambda:InvokeFunction",
+                          "Effect": "Allow",
+                          "Resource": {
+                            "Fn::GetAtt": [
+                              "IdentifyGenderLambdaC3147987",
+                              "Arn"
+                            ]
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "invokeLambdaPolicy00ABA517",
+                    "roles": [
+                      {
+                        "Ref": "SummarizeLambdaRole4DE425CC"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.146.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.146.0"
+            }
+          },
           "InvokeBedrock": {
             "id": "InvokeBedrock",
             "path": "VideoDubbingStack/InvokeBedrock",
@@ -2862,7 +2967,56 @@
                       ],
                       "Version": "2012-10-17"
                     },
-                    "policyName": "InvokeBedrockA334D07D"
+                    "policyName": "InvokeBedrockA334D07D",
+                    "roles": [
+                      {
+                        "Ref": "ImageAnalysisRoleEB85118A"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                  "version": "2.146.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Policy",
+              "version": "2.146.0"
+            }
+          },
+          "AllowInvocationFromLambda": {
+            "id": "AllowInvocationFromLambda",
+            "path": "VideoDubbingStack/AllowInvocationFromLambda",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "VideoDubbingStack/AllowInvocationFromLambda/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                  "aws:cdk:cloudformation:props": {
+                    "policyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "lambda:InvokeFunction",
+                          "Effect": "Allow",
+                          "Resource": {
+                            "Fn::GetAtt": [
+                              "IdentifyGenderLambdaC3147987",
+                              "Arn"
+                            ]
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "policyName": "AllowInvocationFromLambdaC9A155C3",
+                    "roles": [
+                      {
+                        "Ref": "SummarizeLambdaRole4DE425CC"
+                      }
+                    ]
                   }
                 },
                 "constructInfo": {

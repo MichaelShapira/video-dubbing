@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/9a35556434fbeb5a679b10f0bfc1f4be2080090b5d84dfba1d43278eff523008.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/4ec08811b7443331a2486db4569fa16fae5aae07a4e77ec998a990cdb92fde5c.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -46,10 +46,10 @@
             "data": "TranscribeForDubbingLambdaRoleDefaultPolicy996C6622"
           }
         ],
-        "/VideoDubbingStack/lambda_function/Resource": [
+        "/VideoDubbingStack/VideoDubbingStartTranscriptionLambda/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "lambdafunction45C982D3"
+            "data": "VideoDubbingStartTranscriptionLambdaB6770383"
           }
         ],
         "/VideoDubbingStack/VideoDubbingFilesSource/Resource": [
@@ -76,10 +76,10 @@
             "data": "VideoDubbingFilesSourceNotificationsF0B19EC4"
           }
         ],
-        "/VideoDubbingStack/VideoDubbingFilesSource/AllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB": [
+        "/VideoDubbingStack/VideoDubbingFilesSource/AllowBucketNotificationsToVideoDubbingStackVideoDubbingStartTranscriptionLambda28C1D38A": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "VideoDubbingFilesSourceAllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB08C58218"
+            "data": "VideoDubbingFilesSourceAllowBucketNotificationsToVideoDubbingStackVideoDubbingStartTranscriptionLambda28C1D38AEEDEFA89"
           }
         ],
         "/VideoDubbingStack/LatestNodeRuntimeMap": [
@@ -406,16 +406,34 @@
             "data": "ImageAnalysisRoleEB85118A"
           }
         ],
+        "/VideoDubbingStack/ImageAnalysisRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ImageAnalysisRoleDefaultPolicy9FF43BAE"
+          }
+        ],
         "/VideoDubbingStack/IdentifyGenderLambda/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "IdentifyGenderLambdaC3147987"
           }
         ],
+        "/VideoDubbingStack/invokeLambdaPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "invokeLambdaPolicy00ABA517"
+          }
+        ],
         "/VideoDubbingStack/InvokeBedrock/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "InvokeBedrockA334D07D"
+          }
+        ],
+        "/VideoDubbingStack/AllowInvocationFromLambda/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AllowInvocationFromLambdaC9A155C3"
           }
         ],
         "/VideoDubbingStack/Upload Audio File To This S3 bucket": [

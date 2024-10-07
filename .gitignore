@@ -1,0 +1,4 @@
+.venv
+cdk.out
+video_dubbing/__pycache__
+video_dubbing/__init__.py

@@ -30,6 +30,8 @@
      }
     ]
    },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/TranscribeForDubbingLambdaRole/Resource"
    }
@@ -40,7 +42,10 @@
     "PolicyDocument": {
      "Statement": [
       {
-       "Action": "transcribe:StartTranscriptionJob",
+       "Action": [
+        "transcribe:StartTranscriptionJob",
+        "transcribe:TagResource"
+       ],
        "Effect": "Allow",
        "Resource": "*"
       },
@@ -79,20 +84,21 @@
     "aws:cdk:path": "VideoDubbingStack/TranscribeForDubbingLambdaRole/DefaultPolicy/Resource"
    }
   },
-  "lambdafunction45C982D3": {
+  "VideoDubbingStartTranscriptionLambdaB6770383": {
    "Type": "AWS::Lambda::Function",
    "Properties": {
     "Code": {
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "5556eba4940d11aa04895bffe0d70a2566d98edf807505e123e17aa38fd5048b.zip"
+     "S3Key": "d485cfb8303916bb427d7cef174138ddec81e8c53ad45da28ca897499647e965.zip"
     },
     "Environment": {
      "Variables": {
       "AUDIO_LANGUAGE": "en-US"
      }
     },
+    "FunctionName": "VideoDubbingStartTranscribtion",
     "Handler": "video-dubbing-start-transcribe.lambda_handler",
     "MemorySize": 256,
     "Role": {
@@ -109,8 +115,8 @@
     "TranscribeForDubbingLambdaRoleEBA9A27D"
    ],
    "Metadata": {
-    "aws:cdk:path": "VideoDubbingStack/lambda_function/Resource",
-    "aws:asset:path": "asset.5556eba4940d11aa04895bffe0d70a2566d98edf807505e123e17aa38fd5048b",
+    "aws:cdk:path": "VideoDubbingStack/VideoDubbingStartTranscriptionLambda/Resource",
+    "aws:asset:path": "asset.d485cfb8303916bb427d7cef174138ddec81e8c53ad45da28ca897499647e965",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -228,7 +234,7 @@
        ],
        "LambdaFunctionArn": {
         "Fn::GetAtt": [
-         "lambdafunction45C982D3",
+         "VideoDubbingStartTranscriptionLambdaB6770383",
          "Arn"
         ]
        }
@@ -238,20 +244,20 @@
     "Managed": true
    },
    "DependsOn": [
-    "VideoDubbingFilesSourceAllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB08C58218",
+    "VideoDubbingFilesSourceAllowBucketNotificationsToVideoDubbingStackVideoDubbingStartTranscriptionLambda28C1D38AEEDEFA89",
     "VideoDubbingFilesSourcePolicy9AA265B9"
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/VideoDubbingFilesSource/Notifications/Resource"
    }
   },
-  "VideoDubbingFilesSourceAllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB08C58218": {
+  "VideoDubbingFilesSourceAllowBucketNotificationsToVideoDubbingStackVideoDubbingStartTranscriptionLambda28C1D38AEEDEFA89": {
    "Type": "AWS::Lambda::Permission",
    "Properties": {
     "Action": "lambda:InvokeFunction",
     "FunctionName": {
      "Fn::GetAtt": [
-      "lambdafunction45C982D3",
+      "VideoDubbingStartTranscriptionLambdaB6770383",
       "Arn"
      ]
     },
@@ -267,7 +273,7 @@
     }
    },
    "Metadata": {
-    "aws:cdk:path": "VideoDubbingStack/VideoDubbingFilesSource/AllowBucketNotificationsToVideoDubbingStacklambdafunctionDF7D6EFB"
+    "aws:cdk:path": "VideoDubbingStack/VideoDubbingFilesSource/AllowBucketNotificationsToVideoDubbingStackVideoDubbingStartTranscriptionLambda28C1D38A"
    }
   },
   "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
@@ -686,6 +692,8 @@
      }
     ]
    },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/SummarizeLambdaRole/Resource"
    }
@@ -941,7 +949,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "5556eba4940d11aa04895bffe0d70a2566d98edf807505e123e17aa38fd5048b.zip"
+     "S3Key": "d485cfb8303916bb427d7cef174138ddec81e8c53ad45da28ca897499647e965.zip"
     },
     "Environment": {
      "Variables": {
@@ -958,6 +966,7 @@
       }
      }
     },
+    "FunctionName": "VideoDubbingTranscribeEventCompleted",
     "Handler": "process-transcribe-result.lambda_handler",
     "MemorySize": 512,
     "Role": {
@@ -974,7 +983,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/VideoDubbingTranscribeEventCompleted/Resource",
-    "aws:asset:path": "asset.5556eba4940d11aa04895bffe0d70a2566d98edf807505e123e17aa38fd5048b",
+    "aws:asset:path": "asset.d485cfb8303916bb427d7cef174138ddec81e8c53ad45da28ca897499647e965",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1015,6 +1024,8 @@
      }
     ]
    },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/ConvertSubtitlesToPollyLambdaRole/Resource"
    }
@@ -1216,6 +1227,7 @@
       }
      }
     },
+    "FunctionName": "VideoDubbingConvertSubsToPolly",
     "Handler": "srt-to-polly.lambda_handler",
     "MemorySize": 512,
     "Role": {
@@ -1306,6 +1318,8 @@
      }
     ]
    },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/PolyJobCompletedRole/Resource"
    }
@@ -1405,6 +1419,7 @@
       }
      }
     },
+    "FunctionName": "VideoDubbingPolyJobCompleted",
     "Handler": "process-polly-task-result.lambda_handler",
     "MemorySize": 128,
     "Role": {
@@ -1781,6 +1796,7 @@
       }
      }
     },
+    "FunctionName": "VideoDubbingMergeAudio",
     "Handler": "merge-audio.lambda_handler",
     "Layers": [
      {
@@ -1855,8 +1871,47 @@
      }
     ]
    },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/ImageAnalysisRole/Resource"
+   }
+  },
+  "ImageAnalysisRoleDefaultPolicy9FF43BAE": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:GetObject",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "VideoDubbingFilesSource65A974C7",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ImageAnalysisRoleDefaultPolicy9FF43BAE",
+    "Roles": [
+     {
+      "Ref": "ImageAnalysisRoleEB85118A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/ImageAnalysisRole/DefaultPolicy/Resource"
    }
   },
   "IdentifyGenderLambdaC3147987": {
@@ -1866,13 +1921,14 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "8e41564fffda483776e2749ce5f58f203704f683d8d4a30d9ee8520c4c961e2b.zip"
+     "S3Key": "af2831079982e6959e776b4781b3c94f2253f8b9652460155def39b2a581ae24.zip"
     },
     "Environment": {
      "Variables": {
       "FFMPEG_PATH": "/opt/ffmpeg"
      }
     },
+    "FunctionName": "VideoDubbingIdentifyGender",
     "Handler": "identify-gender.lambda_handler",
     "Layers": [
      {
@@ -1890,13 +1946,101 @@
     "Timeout": 900
    },
    "DependsOn": [
+    "ImageAnalysisRoleDefaultPolicy9FF43BAE",
     "ImageAnalysisRoleEB85118A"
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/IdentifyGenderLambda/Resource",
-    "aws:asset:path": "asset.8e41564fffda483776e2749ce5f58f203704f683d8d4a30d9ee8520c4c961e2b",
+    "aws:asset:path": "asset.af2831079982e6959e776b4781b3c94f2253f8b9652460155def39b2a581ae24",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
+   }
+  },
+  "invokeLambdaPolicy00ABA517": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "IdentifyGenderLambdaC3147987",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "invokeLambdaPolicy00ABA517",
+    "Roles": [
+     {
+      "Ref": "SummarizeLambdaRole4DE425CC"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/invokeLambdaPolicy/Resource"
+   }
+  },
+  "InvokeBedrockA334D07D": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "bedrock:InvokeModel",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "IdentifyGenderLambdaC3147987",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "InvokeBedrockA334D07D",
+    "Roles": [
+     {
+      "Ref": "ImageAnalysisRoleEB85118A"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/InvokeBedrock/Resource"
+   }
+  },
+  "AllowInvocationFromLambdaC9A155C3": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "IdentifyGenderLambdaC3147987",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "AllowInvocationFromLambdaC9A155C3",
+    "Roles": [
+     {
+      "Ref": "SummarizeLambdaRole4DE425CC"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "VideoDubbingStack/AllowInvocationFromLambda/Resource"
    }
   },
   "CDKMetadata": {
@@ -2027,7 +2171,7 @@
   },
   "StartTranscribeJobLambda": {
    "Value": {
-    "Ref": "lambdafunction45C982D3"
+    "Ref": "VideoDubbingStartTranscriptionLambdaB6770383"
    }
   },
   "PollyJobLambda": {

@@ -28,13 +28,7 @@ def lambda_handler(event, context):
                 'ShowSpeakerLabels': True,
                 'MaxSpeakerLabels': 10  # Adjust based on expected number of speakers
             },
-        Subtitles={'Formats': ['srt']},
-        Tags = [
-        {
-            'Key':'Workload Customer', 
-            'Value':'CELLCOM'
-        }
-              ]
+        Subtitles={'Formats': ['srt']}
 
     )
     
