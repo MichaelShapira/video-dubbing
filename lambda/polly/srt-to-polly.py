@@ -145,9 +145,10 @@ def lambda_handler(event, context):
                                                media_output_bucket,
                                                media_output_prefix,
                                                translated_srt['subs'][index]["voice_id"])
-                index+=2
+                
                 sequence = translated_srt['subs'][index]["sequence"]
                 start_time = translated_srt['subs'][index]["start_time"]
+                index+=2
             else:  
                 polly_job_id=run_polly_job(translated_srt['subs'][index]["text"], 
                                            translated_srt['subs'][index]["duration"],
@@ -155,9 +156,10 @@ def lambda_handler(event, context):
                                            media_output_bucket,
                                            media_output_prefix,
                                            translated_srt['subs'][index]["voice_id"])
-                index+=1                           
+                                          
                 sequence = translated_srt['subs'][index]["sequence"]
                 start_time = translated_srt['subs'][index]["start_time"]
+                index+=1 
         
         success = insert_dubbing_polly_job(polly_job_id, unique_id,sequence,start_time)
         
