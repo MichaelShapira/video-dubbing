@@ -2,3 +2,8 @@
 cdk.out
 video_dubbing/__pycache__
 video_dubbing/__init__.py
+cdk.out/manifest.json
+cdk.out/tree.json
+cdk.out/VideoDubbingStack.assets.json
+cdk.out/VideoDubbingStack.template.json
+video_dubbing/__pycache__/*

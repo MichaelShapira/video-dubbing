@@ -5,6 +5,7 @@ import json
 import re
 import uuid
 import os
+from botocore.config import Config
 
 # import requests
 transcribe_client = boto3.client("transcribe")
@@ -12,7 +13,13 @@ s3_client = boto3.client('s3')
 sqs = boto3.client('sqs')
 translate = boto3.client('translate')
 polly = boto3.client('polly')
-lambda_client = boto3.client('lambda')
+
+lambda_config = Config(
+    read_timeout=900,  # Timeout for reading the response (in seconds)
+    connect_timeout=5,  # Timeout for establishing connection (in seconds)
+    retries={'max_attempts': 1}  # Disable retries for faster failure (optional)
+)
+lambda_client = boto3.client('lambda', config=lambda_config)
 
 def translate_text(text):
     
@@ -70,13 +77,12 @@ def parse_srt(srt_content,
         end_ms = srt_time_to_ms(end_time)
         duration = calculate_duration(start_time, end_time)
         
-        speaker_id =get_speaker_label_in_time_range(metadata_json,start_ms,end_ms)\
+        #speaker_id =get_speaker_label_in_time_range(metadata_json,start_ms,end_ms)\
+        #if speaker_id is None:
+        #    speaker_id='spk_0'
         
-        if speaker_id is None:
-            speaker_id='spk_0'
-            
-        
-        
+        speaker_id='spk_0'
+         
         speaker_id_index = int(speaker_id[-1])
         
         voice_id=None
@@ -111,12 +117,24 @@ def parse_srt(srt_content,
         InvocationType='RequestResponse',  # Synchronous invocation
         Payload=json.dumps(payload)
     )
-
+    
     # Read the response from Lambda A
     response_payload = json.loads(lambda_response['Payload'].read().decode('utf-8'))
     
-    # Print the output
-    print(f"Response from Lambda A: {response_payload}") 
+    
+    data_json = json.loads(response_payload)
+
+    # Extract the value of the "gender" key
+    gender = data_json[0]["gender"]
+    
+    # Capitalize the first letter
+    gender_capitalized = gender.capitalize()
+    
+    voice_name = next((item["Name"] for item in polly_voices if item["Gender"] == gender_capitalized), None)
+    
+    for item in subtitles:
+      if "voice_id" in item:
+        item["voice_id"] = voice_name
     
     return subtitles
 
@@ -219,12 +237,12 @@ def lambda_handler(event, context):
     response = polly.describe_voices(
                 Engine='standard'
                 )
-    print(response)
+    
     
 
     # Extract elements where LanguageName is "Russian"
-    polly_voices = [voice for voice in response["Voices"] if voice["LanguageName"] == "Russian"]
-    
+    polly_voices = [voice for voice in response["Voices"] if voice["LanguageName"] == language_name]
+
 
     #SRT file
     bucket,bucketKey =  parse_s3_url(mediaFile)
@@ -250,13 +268,15 @@ def lambda_handler(event, context):
     metadata_s3_object = s3_client.get_object(Bucket=bucket, Key=bucketKey)
     metadata_srt_content = metadata_s3_object['Body'].read().decode('utf-8')
     
+    num_of_speakers =1 
     
-    new_json = shrink_metadata_file(metadata_srt_content)
-
-    num_of_speakers = new_json['speaker_labels']['speakers']
-    subtitles = parse_srt(srt_content,new_json,num_of_speakers,polly_voices,video_file)
+    #new_json = shrink_metadata_file(metadata_srt_content)
+    #num_of_speakers = new_json['speaker_labels']['speakers']
+    #subtitles = parse_srt(srt_content,new_json,num_of_speakers,polly_voices,video_file)
     
-
+    subtitles = parse_srt(srt_content,None,num_of_speakers,polly_voices,video_file)
+    
+    print(subtitles)
 
     send_to_sqs(subtitles, f"s3://{work_bucket}/{work_object}",uuid4,video_file,num_of_speakers)
     

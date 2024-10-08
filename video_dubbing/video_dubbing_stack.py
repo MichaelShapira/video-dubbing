@@ -321,7 +321,7 @@ class VideoDubbingStack(Stack):
         # Lambda that is called when Amazon Polly job completed
         polyJobCompletedLambda = _lambda.Function(self, "PolyJobCompletedLambda",
                                     runtime=_lambda.Runtime.PYTHON_3_11,
-                                    function_name='VideoDubbingPolyJobCompleted',
+                                    function_name='VideoDubbingPollyJobCompleted',
                                     handler="process-polly-task-result.lambda_handler",
                                     code=_lambda.Code.from_asset("./lambda/polly"),
                                     timeout=cdk.Duration.seconds(60),
