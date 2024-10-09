@@ -91,7 +91,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "903bf5a0153078261d2a3802186529a48cd6623021d2244332a56c237b5836f1.zip"
+     "S3Key": "3843f2f195395dead6d252db5634cb4fee6a33994737c88ab81b2ce08fc4ea81.zip"
     },
     "Environment": {
      "Variables": {
@@ -116,7 +116,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/VideoDubbingStartTranscriptionLambda/Resource",
-    "aws:asset:path": "asset.903bf5a0153078261d2a3802186529a48cd6623021d2244332a56c237b5836f1",
+    "aws:asset:path": "asset.3843f2f195395dead6d252db5634cb4fee6a33994737c88ab81b2ce08fc4ea81",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -949,7 +949,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "903bf5a0153078261d2a3802186529a48cd6623021d2244332a56c237b5836f1.zip"
+     "S3Key": "3843f2f195395dead6d252db5634cb4fee6a33994737c88ab81b2ce08fc4ea81.zip"
     },
     "Environment": {
      "Variables": {
@@ -983,7 +983,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/VideoDubbingTranscribeEventCompleted/Resource",
-    "aws:asset:path": "asset.903bf5a0153078261d2a3802186529a48cd6623021d2244332a56c237b5836f1",
+    "aws:asset:path": "asset.3843f2f195395dead6d252db5634cb4fee6a33994737c88ab81b2ce08fc4ea81",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1208,7 +1208,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "87a65262c0aafa20a020176307117e7fdf7fa9ee8a2274adbe2be8eafaba302e.zip"
+     "S3Key": "811e22dfc2054f2d831c2b76a0e85d3e29d5e9a0156ae380ca7d208e886f09b9.zip"
     },
     "Environment": {
      "Variables": {
@@ -1245,7 +1245,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/VideoDubbingConvertSubsToPolly/Resource",
-    "aws:asset:path": "asset.87a65262c0aafa20a020176307117e7fdf7fa9ee8a2274adbe2be8eafaba302e",
+    "aws:asset:path": "asset.811e22dfc2054f2d831c2b76a0e85d3e29d5e9a0156ae380ca7d208e886f09b9",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1401,7 +1401,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "87a65262c0aafa20a020176307117e7fdf7fa9ee8a2274adbe2be8eafaba302e.zip"
+     "S3Key": "811e22dfc2054f2d831c2b76a0e85d3e29d5e9a0156ae380ca7d208e886f09b9.zip"
     },
     "Environment": {
      "Variables": {
@@ -1419,7 +1419,7 @@
       }
      }
     },
-    "FunctionName": "VideoDubbingPolyJobCompleted",
+    "FunctionName": "VideoDubbingPollyJobCompleted",
     "Handler": "process-polly-task-result.lambda_handler",
     "MemorySize": 128,
     "Role": {
@@ -1436,7 +1436,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "VideoDubbingStack/PolyJobCompletedLambda/Resource",
-    "aws:asset:path": "asset.87a65262c0aafa20a020176307117e7fdf7fa9ee8a2274adbe2be8eafaba302e",
+    "aws:asset:path": "asset.811e22dfc2054f2d831c2b76a0e85d3e29d5e9a0156ae380ca7d208e886f09b9",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }

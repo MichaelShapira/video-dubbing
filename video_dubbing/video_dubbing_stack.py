@@ -415,9 +415,8 @@ class VideoDubbingStack(Stack):
                                                 "FFMPEG_PATH": '/var/task/bin/ffmpeg',
                                                 "EMAIL_ADDRESS": email_address.value_as_string
                                             },
-                                     layers=[ffmpeg_layer]          
-                                    ) 
-       
+                                     layers=[ffmpeg_layer]
+                                    )
 
         #Create an SQS event source for Lambda
         sqs_event_source = lambda_event_source.SqsEventSource(queueMergeAudio)
@@ -448,11 +447,13 @@ class VideoDubbingStack(Stack):
                                     role = imageAnalysisRole,
                                     environment={  
                                                   "FFMPEG_PATH": '/opt/ffmpeg',
+                                                  "MODEL_ID": 'anthropic.claude-3-sonnet-20240229-v1:0',
+                                                  "MODEL_PROMPT": "You are an AI assistant that should analyze the image and identify the gender of the person who is currently speaking. There are only three possible values that you should return: MALE, FEMALE, or NONE. It could be that the image doesn't contain persons or it is impossible to predict who the current speaker is. In this case, return NONE.No needto explain your response. Only return one of tree option: MALE,FEMALE,NONE ",
+                                                  "FRAMES_TO_CHECK": 1000
                                                 },
-                                     layers=[ffmpeg_layer]          
-                                    ) 
-
-        
+                                     layers=[ffmpeg_layer]       
+                                    )
+     
         invokeLambdaPolicy = iam.Policy(self, "invokeLambdaPolicy")  
         invokeLambdaPolicy.add_statements(PolicyStatement(
             effect=iam.Effect.ALLOW,

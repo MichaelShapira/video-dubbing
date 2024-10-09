@@ -9,6 +9,9 @@ import re
 s3_client = boto3.client('s3')
 bedrock_runtime_client = boto3.client('bedrock-runtime')
 ffmpeg_path=os.environ.get('FFMPEG_PATH')
+MODEL_ID=os.environ.get('MODEL_ID')
+MODEL_PROMPT=os.environ.get('MODEL_PROMPT')
+FRAMES_TO_CHECK=int(os.environ.get('FRAMES_TO_CHECK'))
 
 def parse_s3_path(s3_path):
     # Regex pattern to match S3 paths
@@ -48,12 +51,11 @@ def extract_frame_and_convert_to_base64(input_file, time, output_format='jpg'):
 
     return encoded_string
 
-
-
 def lambda_handler(event, context):
 
     str = event.get('srt')
     video_file = event.get('video_file')
+
     num_of_speakers = event.get('num_of_speakers')
     
     bucket,bucketKey = parse_s3_path(video_file)
@@ -62,11 +64,9 @@ def lambda_handler(event, context):
 
     s3_client.download_file(bucket, bucketKey, local_video_file)
     
-    time = '00:00:10'  # Extract frame at 10 seconds
-    
     speakers = []
 
-    for i in range(num_of_speakers):
+    for i in range(min(num_of_speakers,FRAMES_TO_CHECK)):
         total_male = 0
         total_female=0    
         for entry in str:
@@ -79,9 +79,7 @@ def lambda_handler(event, context):
                     # Convert milliseconds to time format
                     time_val = conv_to_time(math.floor(avg_time_ms))
                     base64_image = extract_frame_and_convert_to_base64(local_video_file, time_val)
-                    #model_id = "anthropic.claude-3-haiku-20240307-v1:0"
-                    model_id = "anthropic.claude-3-sonnet-20240229-v1:0"
-                  
+
                     payload = {
                         "messages": [
                             {
@@ -97,7 +95,7 @@ def lambda_handler(event, context):
                                     },
                                     {
                                         "type": "text",
-                                        "text": "You are an AI assistant that should analyze the image and identify the gender of the person who is currently speaking. There are only three possible values that you should return: MALE, FEMALE, or NONE. It could be that the image doesn't contain persons or it is impossible to predict who the current speaker is. In this case, return NONE.No needto explain your response. Only return one of tree option: MALE,FEMALE,NONE "
+                                        "text": MODEL_PROMPT
                                     }
                                 ]
                             }
@@ -108,7 +106,7 @@ def lambda_handler(event, context):
                     try:
                         # we're ready to invoke the model!
                         response = bedrock_runtime_client.invoke_model(
-                            modelId=model_id,
+                            modelId=MODEL_ID,
                             contentType="application/json",
                             body=json.dumps(payload)
                         )
@@ -118,27 +116,13 @@ def lambda_handler(event, context):
                         output_json = json.loads(output_binary)
                         output = output_json["content"][0]["text"]
                   
-                        print(output)
-                        
+
                         if output == "MALE": 
                             total_male+=1
                         if output == "FEMALE": 
                             total_female+=1
 
-                        print(f'index: {i}')  
-                        print(f'str: {entry}') 
-                        print(total_male)  
-                         
-                        print(total_female) 
-                        
-                        '''
-                        return {
-                            'statusCode': 200,
-                            'body': {
-                                'message': 'Frame extracted and converted successfully',
-                                'base64_image': output
-                            }
-                        }'''
+
                     except Exception as e:
                         print(e)    
                 except subprocess.CalledProcessError as e:
@@ -155,7 +139,3 @@ def lambda_handler(event, context):
     
     print(speakers)
     return json.dumps(speakers)
-  
-
-    
-

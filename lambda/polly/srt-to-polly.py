@@ -4,12 +4,9 @@ import uuid
 import os
 from botocore.exceptions import ClientError
 
-
-
 polly_client = boto3.client('polly')
 dynamodb = boto3.resource('dynamodb')
 sqs = boto3.client('sqs')
-
 
 
 def insert_dubbing_polly_job(polly_job_id, dubbing_job_id,sequence,start_time):
@@ -56,7 +53,6 @@ def run_polly_job(text, duration,unique_id,target_bucket,target_bucket_key,voice
 
     polly_text=f"<speak><prosody amazon:max-duration=\"{duration}ms\">{text}</prosody></speak>"
 
-    
     # Start the asynchronous Polly job
     response = polly_client.start_speech_synthesis_task(
         Engine='standard',
@@ -106,7 +102,7 @@ def lambda_handler(event, context):
 
     # Get the first (and only) record
     record = event['Records'][0]
-    
+
     receipt_handle = record['receiptHandle']
 
     # Extract the message body
@@ -122,17 +118,28 @@ def lambda_handler(event, context):
     skip_element=False
     sequence = None
     start_time = None
+    
+
 
     index = 0
     array_len=len(translated_srt['subs'])
     for i in range(array_len):
-        if index+ 1== array_len:
-            success = insert_dubbing_status(unique_id, i, media_output_bucket, unique_id,video_file)
-            if success:
-                print(f"Record inserted successfully into Dubbing_status table with id {unique_id}")
-            else:
-                print("Failed to insert record into Dubbing_status table")
-            break
+        if index+ 1 == array_len:
+                sequence     = translated_srt['subs'][index]["sequence"]
+                start_time   = translated_srt['subs'][index]["start_time"]
+                polly_job_id = run_polly_job(translated_srt['subs'][index]["text"], 
+                                               translated_srt['subs'][index]["duration"],
+                                               unique_id,
+                                               media_output_bucket,
+                                               media_output_prefix,
+                                               translated_srt['subs'][index]["voice_id"])
+                insert_dubbing_polly_job(polly_job_id, unique_id,sequence,start_time)                               
+                success = insert_dubbing_status(unique_id, i, media_output_bucket, unique_id,video_file)
+                if success:
+                    print(f"Record inserted successfully into Dubbing_status table with id {unique_id}")
+                else:
+                    print("Failed to insert record into Dubbing_status table")
+                break
         if  index+1< array_len and translated_srt['subs'][index]["speaker"] ==  translated_srt['subs'][index+1]["speaker"]:
             pause_between_srt=int(translated_srt['subs'][index+1]["start_time"]) - int(translated_srt['subs'][index]["end_time"])
             if  pause_between_srt<=1000:
