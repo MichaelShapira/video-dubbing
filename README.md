@@ -14,7 +14,8 @@ Source: [JeffDay1.mp4](https://github.com/MichaelShapira/video-dubbing/blob/main
 Target (Russian Translation): [JeffDay1Translated.mp4](https://github.com/MichaelShapira/video-dubbing/blob/main/JeffDay1Translated.mp4)
 
 ## Architecture
-![image](https://github.com/user-attachments/assets/559a711f-3bbe-436f-a185-bec45c7174e7)
+<img width="1115" alt="image" src="https://github.com/user-attachments/assets/bb008872-77a0-4880-92de-e91323ea3486">
+
 
 
 ## Architecture Explained
