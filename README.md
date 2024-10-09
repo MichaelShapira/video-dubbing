@@ -94,6 +94,12 @@ The name of the Lambda appears in the output of the deployment process.
 
 ## Current State of the project
 
-Currently, only single speaker is supported. I plan to expand it to two speakers and also assign male voices to male actors and female voices to female actors. 
+I added gender identification based on sampling the frames from the video. I use Amazon Bedrock to analyze the image to decide who is the current speaker: male or female. This doesn't always work well. Sometimes the image doesn't show the person who is speaking now or the image of a person positioned in a way that prevents correct analysis. 
 
-Also, the current process is not optimized. I do plan to optimize the performance. Specifically, since I use AWS Lambda, which is limited to 15 minutes of runtime, long videos will be translated only partially. This is not due to the limitations of the technology, but rather because of the Lambda timeout. Running the same process on EC2 or EKS/ECS will not have these limitations.
+Following this, I decided to use only a single speaker and choose the gender based on the maximum number of images that identified the speaker as male and images that identified the speaker as female. 
+
+It means that videos with a single speaker (like Jeff's video that I attached) will be identified as male with a high probability, and videos that contain female speakers will be identified as female with a high probability, but videos with a mixed gender will have only one speaker, and it could be the voice of the male or female. 
+
+I also modified the code a little bit. Before this, each subtitle was converted to Polly Job and eventually merged into a single audio file. Now if there is less than a second between subtitles, I convert them into one single Polly job. It reduces the Polly jobs by 2 and also the audio merge job by 2.
+
+Also, since I use AWS Lambda, which is limited to 15 minutes of runtime, long videos will be translated only partially. This is not due to the limitations of the technology, but rather because of the Lambda timeout hard limit. Running the same process on EC2 or EKS/ECS will not have these limitations.
